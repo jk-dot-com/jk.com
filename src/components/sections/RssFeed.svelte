@@ -85,7 +85,7 @@
         href="https://blog.jaysonknight.com/"
         target="_blank"
         rel="noopener noreferrer"
-        style="color: var(--color-cyan); text-decoration: none; font-family: var(--font-heading);"
+        class="view-all-link"
       >
         View all posts →
       </a>
@@ -96,52 +96,52 @@
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {#each Array.from({ length: 3 }) as _, i}
             <div
-              class="rounded-xl p-6 animate-pulse animate-on-scroll"
-              style="background: var(--color-card); border: 1px solid var(--color-border); transition-delay: {i * 0.05}s;"
+              class="skeleton-card rounded-xl p-6 animate-pulse"
+              style="transition-delay: {i * 0.05}s;"
             >
-              <div class="h-3 w-24 rounded mb-4" style="background: rgba(148,163,184,0.2);"></div>
-              <div class="h-5 w-11/12 rounded mb-3" style="background: rgba(148,163,184,0.18);"></div>
-              <div class="h-4 w-full rounded mb-2" style="background: rgba(148,163,184,0.15);"></div>
-              <div class="h-4 w-10/12 rounded" style="background: rgba(148,163,184,0.15);"></div>
+              <div class="h-3 w-24 rounded mb-4" style="background: rgba(0,212,255,0.1);"></div>
+              <div class="h-5 w-11/12 rounded mb-3" style="background: rgba(0,212,255,0.08);"></div>
+              <div class="h-4 w-full rounded mb-2" style="background: rgba(0,212,255,0.06);"></div>
+              <div class="h-4 w-10/12 rounded" style="background: rgba(0,212,255,0.06);"></div>
             </div>
           {/each}
         </div>
       </div>
     {:else if error}
-      <div
-        role="alert"
-        class="rounded-xl p-6"
-        style="background: rgba(255,45,85,0.08); border: 1px solid rgba(255,45,85,0.3); color: var(--color-red, #ff2d55); font-weight: 700;"
-      >
-        {error}
+      <div role="alert" class="error-box rounded-xl p-6">
+        ⚠ {error}
       </div>
     {:else}
       {#if formattedItems.length > 0}
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {#each formattedItems as item, i}
             <article
-              class="feed-card glow-border rounded-xl p-6 flex flex-col"
-              style="transition-delay: {i * 0.05}s;"
+              class="feed-card rounded-xl p-6 flex flex-col"
               in:fade={{ duration: 400, delay: i * 80 }}
             >
-              <p class="text-xs mb-3 uppercase tracking-widest" style="color: var(--color-text-ghost, #475569); font-family: var(--font-mono);">
-                {item.formattedDate}
+              <!-- Top accent bar -->
+              <div class="feed-card-accent" aria-hidden="true"></div>
+
+              <p class="feed-date">
+                // {item.formattedDate}
               </p>
-              <h3 class="text-xl font-bold mb-3" style="font-family: var(--font-heading);">
-                <a href={item.link} target="_blank" rel="noopener noreferrer" class="feed-card-title">
+
+              <h3 class="feed-title">
+                <a href={item.link} target="_blank" rel="noopener noreferrer" class="feed-title-link">
                   {item.title}
                 </a>
               </h3>
-              <p class="text-sm leading-relaxed mb-5 feed-card-desc">{item.description}</p>
+
+              <p class="feed-desc">{item.description}</p>
+
               <a
                 href={item.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="mt-auto"
-                style="color: var(--color-cyan, #00d4ff); text-decoration: none; font-family: var(--font-heading);"
+                class="feed-read-more mt-auto"
                 aria-label={'Read more: ' + item.title}
               >
-                Read More →
+                <span class="feed-read-more-arrow">▶</span> Read More
               </a>
             </article>
           {/each}
@@ -150,15 +150,9 @@
         <div class="flex flex-col gap-4" in:fade={{ duration: 300 }}>
           <p class="text-sm md:text-base" style="color: var(--color-text-dim);">
             No posts available right now. Check back soon or
-            <a
-              href="https://blog.jaysonknight.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              style="color: var(--color-cyan); text-decoration: underline;"
-            >
+            <a href="https://blog.jaysonknight.com/" target="_blank" rel="noopener noreferrer" style="color: var(--color-cyan); text-decoration: underline;">
               visit the blog directly
-            </a>
-            .
+            </a>.
           </p>
         </div>
       {/if}
@@ -167,21 +161,148 @@
 </section>
 
 <style>
+  /* ── Card shell ─────────────────────────────────────── */
   .feed-card {
+    position: relative;
     background: var(--color-card, #111827);
-    border: 1px solid var(--color-border, #1e2d3d);
+    border: 1px solid rgba(0, 212, 255, 0.18);
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 212, 255, 0.06),
+      0 0 12px rgba(0, 212, 255, 0.06);
+    overflow: hidden;
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease,
+      transform 0.2s ease;
   }
 
-  .feed-card-title {
+  .feed-card:hover {
+    border-color: rgba(0, 212, 255, 0.55);
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 212, 255, 0.12),
+      0 0 28px rgba(0, 212, 255, 0.18),
+      0 0 60px rgba(0, 212, 255, 0.06);
+    transform: translateY(-3px);
+  }
+
+  /* Cyan top-edge scanline accent */
+  .feed-card-accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0, 212, 255, 0.7) 30%,
+      rgba(0, 245, 255, 1) 50%,
+      rgba(0, 212, 255, 0.7) 70%,
+      transparent 100%
+    );
+    opacity: 0.6;
+    transition: opacity 0.25s ease;
+  }
+
+  .feed-card:hover .feed-card-accent {
+    opacity: 1;
+  }
+
+  /* ── Date stamp ─────────────────────────────────────── */
+  .feed-date {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-cyan-dim, #0099cc);
+    margin-bottom: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  /* ── Title ──────────────────────────────────────────── */
+  .feed-title {
+    font-family: var(--font-heading, 'Space Grotesk', system-ui, sans-serif);
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 0.75rem;
+  }
+
+  .feed-title-link {
     color: var(--color-text, #e2e8f0);
     text-decoration: none;
+    transition: color 0.2s ease;
   }
 
-  .feed-card-title:hover {
+  .feed-title-link:hover {
     color: var(--color-cyan, #00d4ff);
   }
 
-  .feed-card-desc {
+  /* ── Description ────────────────────────────────────── */
+  .feed-desc {
+    font-size: 0.875rem;
+    line-height: 1.65;
     color: var(--color-text-dim, #94a3b8);
+    margin-bottom: 1.25rem;
+    flex: 1;
+  }
+
+  /* ── Read More CTA ──────────────────────────────────── */
+  .feed-read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-cyan, #00d4ff);
+    text-decoration: none;
+    transition: color 0.2s ease, gap 0.2s ease;
+  }
+
+  .feed-read-more:hover {
+    color: var(--color-cyan-glow, #00f5ff);
+    gap: 0.65rem;
+  }
+
+  .feed-read-more-arrow {
+    font-size: 0.6rem;
+    transition: transform 0.2s ease;
+  }
+
+  .feed-read-more:hover .feed-read-more-arrow {
+    transform: translateX(3px);
+  }
+
+  /* ── Skeleton ───────────────────────────────────────── */
+  .skeleton-card {
+    background: var(--color-card, #111827);
+    border: 1px solid rgba(0, 212, 255, 0.1);
+  }
+
+  /* ── Error ──────────────────────────────────────────── */
+  .error-box {
+    background: rgba(255, 45, 85, 0.08);
+    border: 1px solid rgba(255, 45, 85, 0.3);
+    color: var(--color-red, #ff2d55);
+    font-family: var(--font-mono, monospace);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  /* ── View all link ──────────────────────────────────── */
+  .view-all-link {
+    font-family: var(--font-mono, monospace);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-cyan, #00d4ff);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .view-all-link:hover {
+    color: var(--color-cyan-glow, #00f5ff);
   }
 </style>
