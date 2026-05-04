@@ -342,56 +342,46 @@ describe('GET /api/rss', () => {
     expect(payload).toEqual({ items: [] });
   });
 
-  it('falls back to WordPress posts API when feed fetch returns html', async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValueOnce(
-        new Response('<html><body>challenge</body></html>', {
-          status: 200,
-          headers: { 'Content-Type': 'text/html; charset=UTF-8' },
-        })
-      )
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify([
-            {
-              link: 'https://blog.jaysonknight.com/2026/03/26/edge-first-architecture-why-cloudflare-workers-changes-how-you-think-about-design/',
-              title: { rendered: 'Edge-First Architecture' },
-              excerpt: { rendered: '<p>Cloudflare&#8217;s distributed model...</p>' },
-              date_gmt: '2026-03-27T02:43:10',
-              date: '2026-03-26T22:43:10',
-            },
-          ]),
-          {
-            status: 200,
-            headers: { 'Content-Type': 'application/json; charset=utf-8' },
-          }
-        )
-      );
+  it('returns 200 with posts from WordPress.com public API as primary strategy', async () => {
+    const wpComPayload = {
+      posts: [
+        {
+          ID: 1,
+          title: 'Edge-First Architecture',
+          URL: 'https://blog.jaysonknight.com/2026/03/26/edge-first-architecture/',
+          date: '2026-03-27T02:43:10+00:00',
+          excerpt: '<p>Cloudflare&#8217;s distributed model...</p>',
+          content: '<p>Full content.</p>',
+        },
+      ],
+    };
+
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(JSON.stringify(wpComPayload), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      })
+    );
 
     const response = await GET({
       request: new Request('https://example.com/api/rss?url=https%3A%2F%2Fblog.jaysonknight.com%2Ffeed%2F&max=5'),
     } as Parameters<typeof GET>[0]);
-    const payload = (await response.json()) as { items: Array<{ title: string; link: string; description: string }> };
+    const payload = (await response.json()) as { items: Array<{ title: string; link: string; description: string; pubDate: string }> };
 
     expect(response.status).toBe(200);
-    expect(payload.items).toEqual([
-      {
-        title: 'Edge-First Architecture',
-        link: 'https://blog.jaysonknight.com/2026/03/26/edge-first-architecture-why-cloudflare-workers-changes-how-you-think-about-design/',
-        pubDate: 'Fri, 27 Mar 2026 02:43:10 GMT',
-        description: 'Cloudflare’s distributed model...',
-      },
-    ]);
+    expect(payload.items).toHaveLength(1);
+    expect(payload.items[0].title).toBe('Edge-First Architecture');
+    expect(payload.items[0].link).toBe('https://blog.jaysonknight.com/2026/03/26/edge-first-architecture/');
+    expect(payload.items[0].description).toContain('Cloudflare’s distributed model');
+    expect(payload.items[0].description).not.toContain('<p>');
 
-    const fallbackCall = fetchMock.mock.calls[1];
-    expect(fallbackCall).toBeDefined();
-    const [fallbackUrl, fallbackOptions] = fallbackCall;
-    expect(fallbackUrl).toBeInstanceOf(URL);
-    expect((fallbackUrl as URL).toString()).toContain('https://blog.jaysonknight.com/wp-json/wp/v2/posts?');
-    expect((fallbackUrl as URL).searchParams.get('per_page')).toBe('5');
-    expect((fallbackUrl as URL).searchParams.get('_fields')).toBe('link,title.rendered,excerpt.rendered,date,date_gmt');
-    expect(fallbackOptions).toEqual(
+    // Verify WP.com API was called first and RSS XML was never fetched.
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [wpComUrl, wpComOptions] = fetchMock.mock.calls[0];
+    expect(wpComUrl).toBeInstanceOf(URL);
+    expect((wpComUrl as URL).toString()).toContain('https://public-api.wordpress.com/rest/v1.1/sites/blog.jaysonknight.com/posts/');
+    expect((wpComUrl as URL).searchParams.get('number')).toBe('5');
+    expect(wpComOptions).toEqual(
       expect.objectContaining({
         cache: 'no-store',
         signal: expect.any(AbortSignal),
@@ -401,5 +391,108 @@ describe('GET /api/rss', () => {
         }),
       })
     );
+  });
+
+  it('respects max parameter when calling WordPress.com public API', async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ posts: [] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      )
+      .mockResolvedValueOnce(
+        new Response('<rss><channel></channel></rss>', {
+          status: 200,
+          headers: { 'Content-Type': 'application/xml' },
+        })
+      );
+
+    await GET({
+      request: new Request('https://example.com/api/rss?url=https%3A%2F%2Fblog.jaysonknight.com%2Ffeed%2F&max=10'),
+    } as Parameters<typeof GET>[0]);
+
+    const [wpComUrl] = fetchMock.mock.calls[0];
+    expect((wpComUrl as URL).searchParams.get('number')).toBe('10');
+  });
+
+  it('derives site slug from feed URL hostname for WordPress.com API call', async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ posts: [] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      )
+      .mockResolvedValueOnce(
+        new Response('<rss><channel></channel></rss>', {
+          status: 200,
+          headers: { 'Content-Type': 'application/xml' },
+        })
+      );
+
+    await GET({
+      request: new Request('https://example.com/api/rss?url=https%3A%2F%2Fblog.jaysonknight.com%2Ffeed%2F'),
+    } as Parameters<typeof GET>[0]);
+
+    const [wpComUrl] = fetchMock.mock.calls[0];
+    expect(wpComUrl).toBeInstanceOf(URL);
+    expect((wpComUrl as URL).hostname).toBe('public-api.wordpress.com');
+    expect((wpComUrl as URL).pathname).toContain('blog.jaysonknight.com');
+  });
+
+  it('falls back to RSS XML feed when WordPress.com API fails', async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockResolvedValueOnce(
+        new Response(GHOST_RSS_FIXTURE, {
+          status: 200,
+          headers: { 'Content-Type': 'application/rss+xml' },
+        })
+      );
+
+    const response = await GET({
+      request: new Request('https://example.com/api/rss?url=https%3A%2F%2Fblog.jaysonknight.com%2Ffeed%2F&max=5'),
+    } as Parameters<typeof GET>[0]);
+    const payload = (await response.json()) as { items: Array<{ title: string }> };
+
+    expect(response.status).toBe(200);
+    expect(payload.items).toHaveLength(2);
+    expect(payload.items[0].title).toBe('Building AI Agents on Cloudflare Workers');
+
+    // Verify WP.com API was tried first, then RSS XML.
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls[0][0]).toBeInstanceOf(URL);
+    expect((fetchMock.mock.calls[0][0] as URL).hostname).toBe('public-api.wordpress.com');
+    expect(fetchMock.mock.calls[1][0]).toBe('https://blog.jaysonknight.com/feed/');
+  });
+
+  it('falls back to RSS XML feed when WordPress.com API returns no posts', async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ posts: [] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      )
+      .mockResolvedValueOnce(
+        new Response(GHOST_RSS_FIXTURE, {
+          status: 200,
+          headers: { 'Content-Type': 'application/rss+xml' },
+        })
+      );
+
+    const response = await GET({
+      request: new Request('https://example.com/api/rss?url=https%3A%2F%2Fblog.jaysonknight.com%2Ffeed%2F&max=5'),
+    } as Parameters<typeof GET>[0]);
+    const payload = (await response.json()) as { items: Array<{ title: string }> };
+
+    expect(response.status).toBe(200);
+    expect(payload.items).toHaveLength(2);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });

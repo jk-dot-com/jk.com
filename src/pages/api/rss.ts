@@ -11,7 +11,7 @@ type FeedItem = {
 
 const extractTag = (block: string, tags: string[]): string => {
   for (const tag of tags) {
-    const match = block.match(new RegExp(`<${tag}(?:\s[^>]*)?>([\s\S]*?)<\/${tag}>`, 'i'));
+    const match = block.match(new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tag}>`, 'i'));
     if (match?.[1]) {
       return match[1].trim();
     }
@@ -141,43 +141,45 @@ const fetchWithTimeout = async (
   }
 };
 
-const parseWordPressPosts = (
+/**
+ * Parses a WordPress.com public REST API response (`/rest/v1.1/sites/{site}/posts/`).
+ * The response shape is `{ posts: Array<{ title, URL, date, excerpt, content }> }`.
+ * Returns null when the payload is not a valid WP.com posts response or contains no items.
+ */
+const parseWordPressComPosts = (
   payload: unknown
 ): Array<{ title: string; link: string; pubDate: string; description: string }> | null => {
-  if (!Array.isArray(payload)) {
+  if (!payload || typeof payload !== 'object') {
     return null;
   }
 
-  const items = payload
+  const data = payload as Record<string, unknown>;
+  if (!Array.isArray(data.posts)) {
+    return null;
+  }
+
+  const items = data.posts
     .map((post) => {
       const source = typeof post === 'object' && post ? (post as Record<string, unknown>) : null;
-      const link = typeof source?.link === 'string' ? source.link.trim() : '';
-      const titleRendered =
-        source?.title && typeof source.title === 'object'
-          ? (source.title as Record<string, unknown>).rendered
-          : undefined;
-      const excerptRendered =
-        source?.excerpt && typeof source.excerpt === 'object'
-          ? (source.excerpt as Record<string, unknown>).rendered
-          : undefined;
-      const dateGmt = typeof source?.date_gmt === 'string' ? source.date_gmt.trim() : '';
-      const date = typeof source?.date === 'string' ? source.date.trim() : '';
+      // WP.com uses uppercase `URL` for the post link.
+      const link = typeof source?.URL === 'string' ? source.URL.trim() : '';
       // Use cleanText (no truncation) for titles so long titles are not silently cut off.
-      const title = cleanText(typeof titleRendered === 'string' ? titleRendered : '') || 'Untitled';
-      const pubDateSource = dateGmt ? `${dateGmt}Z` : date;
-      const parsedPubDate = pubDateSource ? new Date(pubDateSource) : null;
-      const pubDate = parsedPubDate && !Number.isNaN(parsedPubDate.getTime()) ? parsedPubDate.toUTCString() : pubDateSource;
+      const title = cleanText(typeof source?.title === 'string' ? source.title : '') || 'Untitled';
+      const date = typeof source?.date === 'string' ? source.date.trim() : '';
+      const excerpt = typeof source?.excerpt === 'string' ? source.excerpt : '';
+      const parsedPubDate = date ? new Date(date) : null;
+      const pubDate = parsedPubDate && !Number.isNaN(parsedPubDate.getTime()) ? parsedPubDate.toUTCString() : date;
 
       return {
         title,
         link,
         pubDate,
-        description: cleanDescription(typeof excerptRendered === 'string' ? excerptRendered : ''),
+        description: cleanDescription(excerpt),
       };
     })
     .filter((item) => item.link);
 
-  return items;
+  return items.length > 0 ? items : null;
 };
 
 const respondWithItems = (items: FeedItem[]): Response =>
@@ -209,13 +211,18 @@ export const GET: APIRoute = async ({ request }) => {
     });
   }
   const sanitizedFeedUrl = sanitizeUrlForLog(parsedFeedUrl);
-  const tryWordPressFallback = async (): Promise<FeedItem[] | null> => {
-    try {
-      const wpApiUrl = new URL('/wp-json/wp/v2/posts', `${parsedFeedUrl.origin}/`);
-      wpApiUrl.searchParams.set('per_page', String(max));
-      wpApiUrl.searchParams.set('_fields', 'link,title.rendered,excerpt.rendered,date,date_gmt');
 
-      const response = await fetchWithTimeout(wpApiUrl, {
+  // Primary: WordPress.com public REST API — unauthenticated, bypasses the Cloudflare WAF
+  // that protects the blog's frontend feed URL. Site slug is derived from the feed URL hostname.
+  const tryWordPressComApi = async (): Promise<FeedItem[] | null> => {
+    try {
+      const site = parsedFeedUrl.hostname;
+      const wpComApiUrl = new URL(
+        `https://public-api.wordpress.com/rest/v1.1/sites/${site}/posts/`
+      );
+      wpComApiUrl.searchParams.set('number', String(max));
+
+      const response = await fetchWithTimeout(wpComApiUrl, {
         headers: {
           Accept: 'application/json',
           'User-Agent': 'Mozilla/5.0 (compatible; JKcom-RSSBot/1.0; +https://jaysonknight.com)',
@@ -227,13 +234,27 @@ export const GET: APIRoute = async ({ request }) => {
         return null;
       }
 
-      const items = parseWordPressPosts(await response.json());
+      // Only attempt JSON parsing when the response is JSON to avoid consuming the body
+      // stream needlessly (the same Response instance may be reused in tests).
+      const contentType = response.headers.get('Content-Type')?.toLowerCase() ?? '';
+      if (!contentType.includes('application/json')) {
+        return null;
+      }
+
+      const items = parseWordPressComPosts(await response.json());
       return items?.slice(0, max) ?? null;
     } catch {
       return null;
     }
   };
 
+  // Try WordPress.com public API first.
+  const wpComItems = await tryWordPressComApi();
+  if (wpComItems && wpComItems.length > 0) {
+    return respondWithItems(wpComItems);
+  }
+
+  // Secondary: fall back to fetching the RSS XML feed directly.
   try {
     const response = await fetchWithTimeout(feedUrl, {
       headers: {
@@ -244,10 +265,6 @@ export const GET: APIRoute = async ({ request }) => {
     });
 
     if (!response.ok) {
-      const fallbackItems = await tryWordPressFallback();
-      if (fallbackItems) {
-        return respondWithItems(fallbackItems);
-      }
       console.error('[api/rss] Failed to fetch feed with non-OK status:', response.status, 'for URL:', sanitizedFeedUrl);
       return new Response(JSON.stringify({ error: `Failed to fetch feed (${response.status}).` }), {
         status: 502,
@@ -258,10 +275,6 @@ export const GET: APIRoute = async ({ request }) => {
     const contentType = response.headers.get('Content-Type')?.toLowerCase() ?? '';
     const mimeType = contentType.split(';', 1)[0]?.trim() ?? '';
     if (mimeType === 'text/html') {
-      const fallbackItems = await tryWordPressFallback();
-      if (fallbackItems) {
-        return respondWithItems(fallbackItems);
-      }
       console.error('[api/rss] Feed returned text/html — likely bot challenge for URL:', sanitizedFeedUrl);
       return new Response(
         JSON.stringify({ error: 'Feed returned an HTML page instead of XML (possible bot challenge or redirect)' }),
@@ -274,10 +287,6 @@ export const GET: APIRoute = async ({ request }) => {
 
     const xml = await response.text();
     if (!isValidFeedDocument(xml)) {
-      const fallbackItems = await tryWordPressFallback();
-      if (fallbackItems) {
-        return respondWithItems(fallbackItems);
-      }
       console.error('[api/rss] Response body is not a valid RSS/Atom document for URL:', sanitizedFeedUrl);
       return new Response(JSON.stringify({ error: 'Feed URL did not return a valid RSS or Atom document' }), {
         status: 502,
@@ -286,19 +295,8 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     const items = parseRssOrAtom(xml, max);
-    if (items.length === 0) {
-      const fallbackItems = await tryWordPressFallback();
-      if (fallbackItems) {
-        return respondWithItems(fallbackItems);
-      }
-    }
-
     return respondWithItems(items);
   } catch (error) {
-    const fallbackItems = await tryWordPressFallback();
-    if (fallbackItems) {
-      return respondWithItems(fallbackItems);
-    }
     const errorName = error instanceof Error ? error.name : 'UnknownError';
     const errorMessage =
       error instanceof Error
