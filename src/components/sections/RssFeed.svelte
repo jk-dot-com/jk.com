@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { fade } from 'svelte/transition';
+
   type FeedItem = {
     title: string;
     link: string;
@@ -108,7 +110,7 @@
     {:else if error}
       <div
         role="alert"
-        class="rounded-xl p-6 animate-on-scroll"
+        class="rounded-xl p-6"
         style="background: rgba(255,45,85,0.08); border: 1px solid rgba(255,45,85,0.3); color: var(--color-red, #ff2d55); font-weight: 700;"
       >
         {error}
@@ -117,8 +119,12 @@
       {#if formattedItems.length > 0}
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {#each formattedItems as item, i}
-            <article class="feed-card glow-border rounded-xl p-6 flex flex-col animate-on-scroll" style="transition-delay: {i * 0.05}s;">
-              <p class="text-xs mb-3 uppercase tracking-widest" style="color: var(--color-text-ghost, #64748b); font-family: var(--font-mono);">
+            <article
+              class="feed-card glow-border rounded-xl p-6 flex flex-col"
+              style="transition-delay: {i * 0.05}s;"
+              in:fade={{ duration: 400, delay: i * 80 }}
+            >
+              <p class="text-xs mb-3 uppercase tracking-widest" style="color: var(--color-text-ghost, #475569); font-family: var(--font-mono);">
                 {item.formattedDate}
               </p>
               <h3 class="text-xl font-bold mb-3" style="font-family: var(--font-heading);">
@@ -141,7 +147,7 @@
           {/each}
         </div>
       {:else}
-        <div class="animate-on-scroll flex flex-col gap-4">
+        <div class="flex flex-col gap-4" in:fade={{ duration: 300 }}>
           <p class="text-sm md:text-base" style="color: var(--color-text-dim);">
             No posts available right now. Check back soon or
             <a
@@ -162,12 +168,12 @@
 
 <style>
   .feed-card {
-    background: var(--color-card, #1e293b);
-    border: 1px solid var(--color-border, rgba(0, 212, 255, 0.15));
+    background: var(--color-card, #111827);
+    border: 1px solid var(--color-border, #1e2d3d);
   }
 
   .feed-card-title {
-    color: var(--color-text, #f1f5f9);
+    color: var(--color-text, #e2e8f0);
     text-decoration: none;
   }
 
