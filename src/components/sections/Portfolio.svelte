@@ -51,6 +51,8 @@
     'Care Innovations',
     'Sogeti',
     'Deloitte Consulting',
+    'Tempur-Sealy Intl',
+    'Skanska',
   ];
 </script>
 
