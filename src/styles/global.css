@@ -390,6 +390,16 @@ code, pre, kbd, samp {
   transform: translateY(0);
 }
 
+/* Respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .gradient-text {
+    animation: none;
+  }
+  .iridescent::after {
+    animation: none;
+  }
+}
+
 /* ============================================================
    PROSE — for blog content via EmDash
    ============================================================ */
