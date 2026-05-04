@@ -10,6 +10,16 @@
     const t = setTimeout(() => { mounted = true; }, 100);
     return () => clearTimeout(t);
   });
+
+  function chipStyle(tag: string): string {
+    if (tag === 'AI Engineer') {
+      return 'background: rgba(123,47,247,0.1); border-color: rgba(123,47,247,0.4); color: var(--color-purple);';
+    }
+    if (tag === 'Rust & WASM') {
+      return 'background: rgba(247,37,133,0.1); border-color: rgba(247,37,133,0.4); color: var(--color-pink);';
+    }
+    return 'background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.3); color: var(--color-cyan);';
+  }
 </script>
 
 <section
@@ -120,14 +130,7 @@
       style="opacity: {mounted ? 1 : 0}; transition: opacity 0.8s ease 0.6s;"
     >
       {#each ['Azure Architect', 'AI Engineer', 'Cloudflare Specialist', 'Rust & WASM', 'Privacy & Security'] as tag}
-        <li
-          class="chip"
-          style="
-            background: {tag === 'AI Engineer' ? 'rgba(123,47,247,0.1)' : tag === 'Rust & WASM' ? 'rgba(247,37,133,0.1)' : 'rgba(0,212,255,0.08)'};
-            border-color: {tag === 'AI Engineer' ? 'rgba(123,47,247,0.4)' : tag === 'Rust & WASM' ? 'rgba(247,37,133,0.4)' : 'rgba(0,212,255,0.3)'};
-            color: {tag === 'AI Engineer' ? 'var(--color-purple)' : tag === 'Rust & WASM' ? 'var(--color-pink)' : 'var(--color-cyan)'};
-          "
-        >
+        <li class="chip" style={chipStyle(tag)}>
           {tag}
         </li>
       {/each}
