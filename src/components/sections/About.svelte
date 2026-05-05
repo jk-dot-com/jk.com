@@ -3,7 +3,8 @@
   // Svelte 5, TailwindCSS v4
 
   const expertise = [
-    { label: 'AI Engineering', detail: 'Anthropic Claude (primary), LLM integration, prompt engineering, agentic systems & orchestration agents, Agentic Development Environments (ADE)' },
+    { label: 'AI Architecture & Agentic Systems', detail: 'Designing end-to-end agentic workflows: multi-agent orchestration, tool-use pipelines, Agentic Development Environments (ADEs), and production-grade AI systems — including Bloqr, an AI-native publishing platform built from the ground up.' },
+    { label: 'AI Engineering', detail: 'Anthropic Claude (primary), LLM integration, prompt engineering, agentic systems & orchestration agents, MCP servers, and AI gateway design for edge deployment.' },
     { label: 'AI Platforms on Cloudflare', detail: 'AI gateways, MCP servers, Workers AI, Vectorize, and full agentic pipeline deployment on the Cloudflare edge' },
     { label: 'Cloud Solutions Architecture', detail: 'Native cloud architecture, multi-cloud strategy, cloud-native patterns, and landing zone design across Azure and Cloudflare' },
     { label: 'Azure Solutions Architecture', detail: 'Landing zones, AKS, App Services, Azure Networking & VWAN, Entra ID, FinOps' },
@@ -46,14 +47,15 @@
         </h2>
 
         <p class="text-lg mb-8" style="color: var(--color-text-dim); line-height: 1.8;">
-          Twenty-plus years of building software across enterprise stacks — from legacy monoliths to bleeding-edge Cloudflare Workers and AI-native platforms. I specialize in translating complex business requirements into elegant, scalable architectures on Microsoft Azure, the Cloudflare platform, and agentic AI systems powered by Anthropic Claude.
+          Twenty-plus years of building software across enterprise stacks — from legacy monoliths to bleeding-edge Cloudflare Workers and AI-native platforms. I design and build agentic AI systems end-to-end: multi-agent orchestration, MCP servers, Agentic Development Environments (ADEs), and production AI workflows grounded in real delivery experience. That includes Bloqr, my own AI-native publishing platform, and complex agentic architectures for enterprise clients on Azure and the Cloudflare edge.
         </p>
 
         <!-- What I Do list -->
         <div class="space-y-3 mb-10">
           {#each [
+            'AI Architecture & Agentic Workflow Design',
             'Enterprise Solutions Architecture & Implementation',
-            'AI Engineering, Agentic Systems & Platform Design',
+            'AI Engineering, MCP Servers & Platform Design',
             'Software Design, Development & Deployment',
             'Technology & Cloud Consulting',
             'Enterprise Network Architecture',

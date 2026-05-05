@@ -39,14 +39,15 @@
     },
     {
       icon: '🤖',
-      title: 'AI Engineering & Agentic Systems',
+      title: 'AI Architecture & Agentic Systems',
       description:
-        'End-to-end AI platform design using Anthropic Claude as the primary model. I design Agentic Development Environments (ADEs), orchestration agents, MCP servers, and AI gateways — all deployable to the Cloudflare edge.',
-      tags: ['Anthropic Claude', 'MCP', 'AI Gateway', 'Agents'],
+        'End-to-end agentic AI workflow design and implementation — multi-agent orchestration, MCP servers, AI gateways, and Agentic Development Environments (ADEs). Built on Anthropic Claude and deployable to the Cloudflare edge. Real production experience includes Bloqr, an AI-native publishing platform, and enterprise agentic pipelines.',
+      tags: ['Anthropic Claude', 'MCP', 'AI Gateway', 'Agents', 'ADEs'],
       bullets: [
+        'Agentic workflow architecture: multi-agent pipelines and tool-use orchestration',
         'Agentic Development Environment (ADE) design & implementation',
-        'Orchestration agent pipelines and multi-agent coordination',
         'MCP server and AI gateway deployment on Cloudflare Workers',
+        'LLM integration, prompt engineering, and model evaluation',
       ],
     },
     {
@@ -99,14 +100,15 @@
     },
     {
       icon: '🛠️',
-      title: 'Technical Advisory',
+      title: 'Technical Advisory & Fractional CTO',
       description:
-        'Architecture reviews, technology selection, team enablement, and fractional CTO services. I help engineering orgs ship better software, faster.',
-      tags: ['Advisory', 'CTO', 'Code Review', 'Team'],
+        'Fractional CTO services for startups and scale-ups that need senior technical leadership without the full-time overhead. I embed with your team to own the technical roadmap, make build-vs-buy decisions, establish engineering standards, and translate product vision into executable architecture — then step back when you\'re ready to hire full-time.',
+      tags: ['Fractional CTO', 'Advisory', 'Roadmap', 'Team'],
       bullets: [
-        'Architecture reviews and modernization roadmaps',
-        'Team enablement through pairing and standards',
-        'Pragmatic technology selection for product velocity',
+        'Technical roadmap ownership and prioritization',
+        'Architecture reviews, modernization planning, and build-vs-buy guidance',
+        'Engineering standards, hiring bar, and team enablement',
+        'Translate business strategy into executable technical direction',
       ],
     },
   ];
@@ -195,8 +197,8 @@
         What I <span class="gradient-text">Build</span> &amp; <span class="gradient-text">Consult</span>
       </h2>
       <p class="text-lg max-w-2xl" style="color: var(--color-text-dim);">
-        From greenfield cloud platforms to legacy modernization — I partner with teams
-        to design, build, and operate infrastructure that lasts.
+        From agentic AI platforms to cloud infrastructure and fractional CTO leadership — I partner with teams
+        to design, build, and operate systems that last.
       </p>
     </div>
 
