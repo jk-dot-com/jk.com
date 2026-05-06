@@ -217,6 +217,18 @@ code, pre, kbd, samp {
   box-shadow: var(--glow-cyan);
 }
 
+/* When a tile uses both glow-border AND iridescent, the opaque cyan border
+   sits on top of the ::after sweep and hides it entirely. Use a transparent
+   border so the shimmer pseudo-element acts as the visible border instead.
+   The box-shadow glow is preserved — only the stroke color is cleared. */
+.glow-border.iridescent {
+  border-color: transparent;
+}
+
+.glow-border.iridescent:hover {
+  border-color: transparent;
+}
+
 /* Iridescent border shimmer — a thin pink→purple streak that sweeps slowly
    across the border, like light catching a surface. 95% invisible, 5% magic. */
 .iridescent {
