@@ -221,8 +221,7 @@ code, pre, kbd, samp {
    across the border, like light catching a surface. 95% invisible, 5% magic. */
 .iridescent {
   position: relative;
-  overflow: hidden;        /* clip the sweeping pseudo-element */
-  contain: layout style;   /* scope recalcs to this subtree */
+  overflow: hidden;   /* clip the sweeping pseudo-element */
 }
 
 .iridescent::after {
@@ -233,6 +232,7 @@ code, pre, kbd, samp {
   padding: 1px;
   background: linear-gradient(90deg, transparent 0%, #f72585 45%, #7b2ff7 55%, transparent 100%);
   transform: translateX(200%);
+  will-change: transform;   /* promote to compositor layer — the real perf win */
   animation: shimmer-streak 8s ease-in-out infinite;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: destination-out;
