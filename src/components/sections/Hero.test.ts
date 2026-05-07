@@ -18,7 +18,7 @@ describe('Hero section', () => {
 
   it('implements CRT typewriter subtitle with Phosphor cursor', () => {
     expect(heroSource).toContain('FULL_TEXT');
-    expect(heroSource).toContain("'Imagination | Unleashed'");
+    expect(heroSource).toContain("'Unbounded Imagination'");
     expect(heroSource).toContain('displayedText');
     expect(heroSource).toContain('cursorVisible');
     expect(heroSource).toContain('cursorBlinking');
@@ -29,7 +29,7 @@ describe('Hero section', () => {
     expect(heroSource).toContain('█');
     // Screen-reader fallback text
     expect(heroSource).toContain('sr-only');
-    expect(heroSource).toContain('Imagination | Unleashed');
+    expect(heroSource).toContain('Unbounded Imagination');
   });
 
   it('integrates with TV intro sequencing via introState and tv-intro-done event', () => {
