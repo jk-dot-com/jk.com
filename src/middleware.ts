@@ -33,7 +33,7 @@ const securityHeaders = defineMiddleware(async ({ url }, next) => {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://assets.calendly.com",
       "font-src 'self' data: https://fonts.gstatic.com",
       "img-src 'self' data: blob: https:",
-      "connect-src 'self' https://cloudflareinsights.com https://static.cloudflareinsights.com https://calendly.com https://assets.calendly.com https://www.google-analytics.com https://www.googletagmanager.com https://region1.google-analytics.com",
+      "connect-src 'self' https://cloudflareinsights.com https://static.cloudflareinsights.com https://calendly.com https://assets.calendly.com https://www.google-analytics.com https://www.googletagmanager.com",
       "media-src 'self'",
       "frame-src 'self' https://calendly.com https://*.calendly.com https://m.stripe.network",
       "frame-ancestors 'none'",
@@ -51,42 +51,4 @@ const securityHeaders = defineMiddleware(async ({ url }, next) => {
   return newResponse;
 });
 
-// Route caching middleware — Cloudflare-native Cache-Control
-const routeCache = defineMiddleware(async ({ request, url }, next) => {
-  const response = await next();
-
-  // Static content — cache aggressively at Cloudflare edge
-  if (url.pathname.startsWith('/assets/') || url.pathname.startsWith('/_astro/')) {
-    const cached = new Response(response.body, response);
-    cached.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
-    return cached;
-  }
-
-  // Blog pages — cache with revalidation
-  if (url.pathname.startsWith('/blog')) {
-    const cached = new Response(response.body, response);
-    cached.headers.set('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
-    return cached;
-  }
-
-  // Homepage — short-lived edge cache
-  if (url.pathname === '/') {
-    const cached = new Response(response.body, response);
-    cached.headers.set('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=3600');
-    return cached;
-  }
-
-  // API routes — no caching (except OG images which have their own cache headers)
-  if (
-    url.pathname.startsWith('/api/') &&
-    !(url.pathname === '/api/og' || url.pathname.startsWith('/api/og/'))
-  ) {
-    const nocache = new Response(response.body, response);
-    nocache.headers.set('Cache-Control', 'no-store, no-cache');
-    return nocache;
-  }
-
-  return response;
-});
-
-export const onRequest = sequence(securityHeaders, routeCache);
+export const onRequest = sequence(securityHeaders);
