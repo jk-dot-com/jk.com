@@ -248,6 +248,7 @@
             <div
               class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
               style="background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2);"
+              aria-hidden="true"
             ><span style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--color-cyan); letter-spacing: 0.05em;">TEL</span></div>
             <div>
               <div class="text-xs mb-0.5 font-mono uppercase tracking-widest" style="color: var(--color-text-ghost);">Phone</div>
@@ -259,6 +260,7 @@
             <div
               class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
               style="background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2);"
+              aria-hidden="true"
             ><span style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--color-cyan); letter-spacing: 0.05em;">LOC</span></div>
             <div>
               <div class="text-xs mb-0.5 font-mono uppercase tracking-widest" style="color: var(--color-text-ghost);">Location</div>

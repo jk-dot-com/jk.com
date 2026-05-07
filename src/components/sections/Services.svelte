@@ -402,7 +402,7 @@
         class="btn btn-red iridescent"
         aria-label="Book a consultation via Calendly"
       >
-        📅 Book a Consultation
+        Book a Consultation
       </a>
     </div>
   </div>

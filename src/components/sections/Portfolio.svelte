@@ -286,4 +286,5 @@
 
   .portfolio-tag:hover .portfolio-tag-bracket {
     opacity: 0.9;
-  }</style>
+  }
+</style>
