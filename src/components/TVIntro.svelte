@@ -1,38 +1,217 @@
 <script lang="ts">
-  type IntroPhase = 'hidden' | 'active' | 'fading';
+  import { introState } from '$lib/intro-store.svelte.ts';
 
-  let phase = $state<IntroPhase>('hidden');
+  type Phase = 'off' | 'power-on' | 'static' | 'emerge' | 'clear' | 'done';
+  const POWER_ON_START_MS = 50;
+  const POWER_ON_EXPAND_MS = 70;
+  const STATIC_START_MS = 200;
+  const EMERGE_START_MS = 450;
+  const CLEAR_START_MS = 900;
+  const DONE_START_MS = 1400;
+  const SWEEP_BAR_SPEED = 4;
+  const SWEEP_BAR_HEIGHT = 40;
+  const STATIC_RESOLUTION_SCALE = 2;
+
+  let phase = $state<Phase>('off');
+  let canvas = $state<HTMLCanvasElement | undefined>(undefined);
+  let collapsedToLine = $state(false);
+  let powerTransitionEnabled = $state(false);
+  let powerOnPlayed = $state(false);
+
+  function notifyDone() {
+    if (introState.done) return;
+    introState.done = true;
+    document.dispatchEvent(new CustomEvent('tv-intro-done'));
+  }
+
+  function drawNoise(ctx: CanvasRenderingContext2D, imageData: ImageData, w: number, h: number, frame: number) {
+    const data = imageData.data;
+    const blockSize = 3;
+
+    const barY = (frame * SWEEP_BAR_SPEED) % h;
+    const barHeight = SWEEP_BAR_HEIGHT;
+
+    for (let y = 0; y < h; y += blockSize) {
+      for (let x = 0; x < w; x += blockSize) {
+        const inBar = y >= barY && y < barY + barHeight;
+        const brightness = Math.random() * 255;
+        const alpha = inBar ? Math.random() * 60 + 180 : Math.random() * 120 + 80;
+        const value = Math.min(255, inBar ? brightness * 1.3 : brightness);
+
+        for (let dy = 0; dy < blockSize && y + dy < h; dy++) {
+          for (let dx = 0; dx < blockSize && x + dx < w; dx++) {
+            const idx = ((y + dy) * w + (x + dx)) * 4;
+            data[idx] = value;
+            data[idx + 1] = value;
+            data[idx + 2] = value;
+            data[idx + 3] = alpha;
+          }
+        }
+      }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+  }
 
   $effect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (typeof window === 'undefined') return;
+
+    const cleanups: Array<() => void> = [];
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+    const originalOverflow = document.body.style.overflow;
+
+    const schedule = (fn: () => void, delay: number) => {
+      const id = setTimeout(fn, delay);
+      timeouts.push(id);
+      return id;
+    };
+
+    const finalizeImmediately = () => {
+      phase = 'done';
+      document.body.style.overflow = originalOverflow;
+      notifyDone();
+    };
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const seen = sessionStorage.getItem('tv-intro-seen');
+
+    if (seen || reduceMotion) {
+      finalizeImmediately();
       return;
     }
 
-    if (sessionStorage.getItem('tv-intro-seen') === 'true') {
-      return;
-    }
+    document.body.style.overflow = 'hidden';
 
-    phase = 'active';
+    schedule(() => {
+      phase = 'power-on';
+      powerOnPlayed = true;
+      powerTransitionEnabled = false;
+      collapsedToLine = true;
+    }, POWER_ON_START_MS);
 
-    const fadeTimer = window.setTimeout(() => {
-      phase = 'fading';
-    }, 450);
+    schedule(() => {
+      powerTransitionEnabled = true;
+      collapsedToLine = false;
+    }, POWER_ON_EXPAND_MS);
 
-    const doneTimer = window.setTimeout(() => {
-      phase = 'hidden';
-      sessionStorage.setItem('tv-intro-seen', 'true');
-    }, 900);
+    schedule(() => {
+      phase = 'static';
+    }, STATIC_START_MS);
+
+    schedule(() => {
+      phase = 'emerge';
+    }, EMERGE_START_MS);
+
+    schedule(() => {
+      phase = 'clear';
+      document.body.style.overflow = originalOverflow;
+    }, CLEAR_START_MS);
+
+    schedule(() => {
+      phase = 'done';
+      sessionStorage.setItem('tv-intro-seen', '1');
+      notifyDone();
+    }, DONE_START_MS);
+
+    cleanups.push(() => {
+      timeouts.forEach((id) => clearTimeout(id));
+      document.body.style.overflow = originalOverflow;
+    });
 
     return () => {
-      window.clearTimeout(fadeTimer);
-      window.clearTimeout(doneTimer);
+      cleanups.forEach((run) => run());
+    };
+  });
+
+  $effect(() => {
+    if (typeof window === 'undefined') return;
+    if (phase !== 'static' && phase !== 'emerge') return;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let rafId: number | undefined;
+    let frame = 0;
+    let noiseBuffer: ImageData | undefined;
+    let resizeRafId: number | undefined;
+
+    const resize = () => {
+      const width = Math.max(1, Math.floor(window.innerWidth / STATIC_RESOLUTION_SCALE));
+      const height = Math.max(1, Math.floor(window.innerHeight / STATIC_RESOLUTION_SCALE));
+
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+        noiseBuffer = ctx.createImageData(width, height);
+      }
+    };
+
+    const handleResize = () => {
+      if (resizeRafId !== undefined) return;
+      resizeRafId = requestAnimationFrame(() => {
+        resizeRafId = undefined;
+        resize();
+      });
+    };
+
+    resize();
+
+    const tick = () => {
+      if (!noiseBuffer || noiseBuffer.width !== canvas.width || noiseBuffer.height !== canvas.height) {
+        noiseBuffer = ctx.createImageData(canvas.width, canvas.height);
+      }
+      drawNoise(ctx, noiseBuffer, canvas.width, canvas.height, frame);
+      frame += 1;
+      rafId = requestAnimationFrame(tick);
+    };
+
+    tick();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      if (rafId !== undefined) {
+        cancelAnimationFrame(rafId);
+      }
+      if (resizeRafId !== undefined) {
+        cancelAnimationFrame(resizeRafId);
+      }
+      window.removeEventListener('resize', handleResize);
     };
   });
 </script>
 
-{#if phase !== 'hidden'}
-  <div class="tv-intro-overlay" class:tv-intro-fade={phase === 'fading'} aria-hidden="true">
-    <div class="tv-intro-noise"></div>
+{#if phase !== 'done'}
+  <div
+    class="tv-intro-overlay"
+    class:power-on-played={powerOnPlayed}
+    class:power-transition={powerTransitionEnabled}
+    class:clear={phase === 'clear'}
+    style={`transform: scaleY(${collapsedToLine ? '0.004' : '1'});`}
+    aria-hidden="true"
+  >
+    {#if phase === 'static' || phase === 'emerge' || phase === 'clear'}
+      <canvas bind:this={canvas} class="noise-canvas"></canvas>
+      <div class="scanlines"></div>
+      <div class="scanline-flicker"></div>
+    {/if}
+
+    {#if phase === 'emerge' || phase === 'clear'}
+      <div class="intro-text" class:revealed={phase === 'emerge' || phase === 'clear'}>
+        <h1
+          class="glitch-text relative text-7xl font-black tracking-tight text-white select-none sm:text-8xl lg:text-9xl"
+          data-text="THIS. IS."
+        >
+          THIS. IS.
+        </h1>
+        <div
+          class="gradient-text text-glow text-7xl font-black tracking-tight sm:text-8xl lg:text-9xl"
+          style="font-family: var(--font-heading);"
+        >
+          JK.com
+        </div>
+      </div>
+    {/if}
   </div>
 {/if}
 
@@ -40,49 +219,144 @@
   .tv-intro-overlay {
     position: fixed;
     inset: 0;
-    z-index: 60;
-    pointer-events: none;
+    z-index: 9999;
     background: #000;
+    transform-origin: center center;
     opacity: 1;
-    transition: opacity 0.35s ease;
+    transition: none;
   }
 
-  .tv-intro-fade {
+  .tv-intro-overlay.power-transition {
+    transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .tv-intro-overlay.clear {
     opacity: 0;
+    transition: opacity 450ms ease, transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
   }
 
-  .tv-intro-noise {
+  .tv-intro-overlay.power-on-played {
+    background: #060606;
+  }
+
+  .noise-canvas,
+  .scanlines,
+  .scanline-flicker {
     position: absolute;
     inset: 0;
-    opacity: 0.4;
-    background:
-      repeating-linear-gradient(
-        0deg,
-        rgba(0, 212, 255, 0.09) 0px,
-        rgba(0, 212, 255, 0.09) 1px,
-        transparent 1px,
-        transparent 3px
-      ),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='80' viewBox='0 0 120 80'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.25' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='80' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
-    background-size: auto, 120px 80px;
-    animation: tv-noise 0.12s steps(2) infinite;
   }
 
-  @keyframes tv-noise {
+  .noise-canvas {
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    image-rendering: pixelated;
+  }
+
+  .scanlines {
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.5) 0,
+      rgba(0, 0, 0, 0.5) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+    opacity: 0.3;
+    mix-blend-mode: screen;
+  }
+
+  .scanline-flicker {
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.2) 35%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    opacity: 0.2;
+    animation: scanline-sweep 240ms linear infinite;
+    mix-blend-mode: screen;
+  }
+
+  .intro-text {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    text-align: center;
+    clip-path: inset(0 0 100% 0);
+    opacity: 0;
+    transition: clip-path 300ms ease, opacity 300ms ease;
+  }
+
+  .intro-text.revealed {
+    clip-path: inset(0 0 0% 0);
+    opacity: 1;
+  }
+
+  .glitch-text::before,
+  .glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    color: white;
+    font-family: var(--font-heading);
+    font-weight: 900;
+  }
+
+  .glitch-text::before {
+    color: var(--color-cyan);
+    animation: glitch-1 8s steps(1) infinite;
+    opacity: 0.6;
+  }
+
+  .glitch-text::after {
+    color: var(--color-pink);
+    animation: glitch-2 8s steps(1) infinite;
+    opacity: 0.4;
+  }
+
+  @keyframes scanline-sweep {
     0% {
-      background-position: 0 0, 0 0;
-    }
-    50% {
-      background-position: 0 0, -10px 6px;
+      transform: translateY(-100%);
     }
     100% {
-      background-position: 0 0, 8px -4px;
+      transform: translateY(100%);
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .tv-intro-noise {
-      animation: none;
+  @keyframes glitch-1 {
+    0%,
+    97%,
+    100% {
+      transform: translate(0);
+      clip-path: inset(0 0 0 0);
+    }
+    98% {
+      transform: translate(-2px, 1px);
+      clip-path: inset(10% 0 65% 0);
+    }
+    99% {
+      transform: translate(2px, -1px);
+      clip-path: inset(60% 0 5% 0);
+    }
+  }
+
+  @keyframes glitch-2 {
+    0%,
+    97%,
+    100% {
+      transform: translate(0);
+      clip-path: inset(0 0 0 0);
+    }
+    98% {
+      transform: translate(2px, -1px);
+      clip-path: inset(20% 0 55% 0);
+    }
+    99% {
+      transform: translate(-2px, 1px);
+      clip-path: inset(50% 0 15% 0);
     }
   }
 </style>
