@@ -148,6 +148,15 @@ const shouldRenderTvIntro = Astro.url.pathname === '/';
   </head>
 
   <body class="grid-overlay">
+    {shouldRenderTvIntro && <script is:inline>
+      (function() {
+        try {
+          var seen = sessionStorage.getItem('tv-intro-seen');
+          var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (!seen && !rm) { document.documentElement.classList.add('tv-intro-active'); }
+        } catch(e) {}
+      })();
+    </script>}
     {shouldRenderTvIntro && <TVIntro client:load />}
 
     <!-- Subtle scan-line overlay (CSS only) -->
