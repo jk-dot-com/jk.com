@@ -62,7 +62,7 @@
     function renderStaticLine() {
       displayedText = FULL_TEXT;
       cursorVisible = true;
-      cursorBlinking = true;
+      cursorBlinking = false;
       typingDone = true;
     }
 
