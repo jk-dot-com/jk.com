@@ -1,8 +1,9 @@
 ---
 // BaseLayout.astro — root layout for all pages
-// Phosphor: global grid background and subtle scan-line overlay
+// Phosphor: homepage TVIntro overlay, global grid background, subtle scan-line overlay
 // Injects: fonts (Astro Fonts API), CSP, Cloudflare Analytics, Svelte hydration
 import '../styles/global.css';
+import TVIntro from '../components/TVIntro.svelte';
 import Header from '../components/layout/Header.svelte';
 import Footer from '../components/layout/Footer.svelte';
 import { buildSeoMetadata } from '../lib/seo';
@@ -30,6 +31,7 @@ const seo = buildSeoMetadata({
   ogImage: ogImageProp,
 });
 const cfAnalyticsToken = import.meta.env.CLOUDFLARE_ANALYTICS_TOKEN;
+const shouldRenderTvIntro = Astro.url.pathname === '/';
 ---
 
 <!doctype html>
@@ -132,6 +134,8 @@ const cfAnalyticsToken = import.meta.env.CLOUDFLARE_ANALYTICS_TOKEN;
   </head>
 
   <body class="grid-overlay">
+    {shouldRenderTvIntro && <TVIntro client:load />}
+
     <!-- Subtle scan-line overlay (CSS only) -->
     <div
       class="pointer-events-none fixed inset-0 z-50 opacity-[0.015]"
