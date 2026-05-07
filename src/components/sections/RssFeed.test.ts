@@ -23,8 +23,15 @@ describe('RssFeed section', () => {
     expect(rssFeedSource).toContain('error-box');
   });
 
-  it('uses Phosphor iridescent feed cards', () => {
-    expect(rssFeedSource).toContain('feed-card iridescent');
+  it('uses Portfolio-matched Phosphor glow-border iridescent feed cards', () => {
+    expect(rssFeedSource).toContain('feed-card glow-border iridescent');
+  });
+
+  it('defers feed card border and glow styling to the shared Phosphor utilities', () => {
+    expect(rssFeedSource).not.toContain('border: 1px solid rgba(0, 212, 255, 0.18);');
+    expect(rssFeedSource).not.toContain('border-color 0.25s ease');
+    expect(rssFeedSource).not.toContain('box-shadow:');
+    expect(rssFeedSource).not.toContain('border-color: rgba(0, 212, 255, 0.55);');
   });
 
   it('uses Svelte fade transition on feed item reveal', () => {
