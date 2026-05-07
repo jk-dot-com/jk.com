@@ -20,14 +20,6 @@ export default defineConfig({
   // Astro 6 uses workerd runtime natively — no platformProxy config needed
   adapter: cloudflare(cloudflareAdapterOptions),
 
-  // Experimental rendering options
-  experimental: {
-    queuedRendering: {
-      enabled: true,
-      contentCache: true
-    }
-  },
-  
   integrations: [
     svelte(),
     emdash({
@@ -67,26 +59,6 @@ export default defineConfig({
       subsets: ['latin'],
     },
   ],
-
-  // Content Security Policy (stable in Astro 6)
-  // NOTE: verify exact API shape with `npx astro check` — the middleware fallback
-  // in src/middleware.ts handles CSP if this config key differs in your version.
-  // Uncomment and adjust once confirmed:
-  //
-  // contentSecurityPolicy: {
-  //   mode: 'hash',
-  //   directives: {
-  //     'default-src': ["'self'"],
-  //     'script-src': ["'self'", "'strict-dynamic'", 'https://static.cloudflareinsights.com'],
-  //     'style-src': ["'self'", "'unsafe-inline'"],
-  //     'img-src': ["'self'", 'data:', 'blob:', 'https:'],
-  //     'font-src': ["'self'", 'data:', 'https://fonts.gstatic.com'],
-  //     'connect-src': ["'self'", 'https://cloudflareinsights.com'],
-  //     'frame-ancestors': ["'none'"],
-  //     'base-uri': ["'self'"],
-  //     'form-action': ["'self'"],
-  //   },
-  // },
 
   site: 'https://jaysonknight.com',
 });
