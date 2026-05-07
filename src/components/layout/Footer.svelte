@@ -1,10 +1,13 @@
 <script lang="ts">
   // Footer.svelte — site footer
-  // Phosphor: built-with terminal block, monospace footer utility bar
+  // Phosphor: built-with terminal block, monospace footer utility bar, SYS: ONLINE status readout
   import ShimmerToggle from '../ui/ShimmerToggle.svelte';
 
   const year = new Date().getFullYear();
-  const buildDate = String(import.meta.env.PUBLIC_BUILD_DATE ?? '').replace(/-/g, '.');
+  const rawBuildDate = String(import.meta.env.PUBLIC_BUILD_DATE ?? '').trim();
+  const buildDate = /^\d{4}-\d{2}-\d{2}$/.test(rawBuildDate)
+    ? rawBuildDate.replace(/-/g, '.')
+    : 'LOCAL';
 
   const links = [
     { href: '#about', label: 'About' },
