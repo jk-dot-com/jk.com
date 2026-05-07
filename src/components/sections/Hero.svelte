@@ -7,7 +7,7 @@
   import { introState } from '$lib/intro-store.svelte.ts';
 
   let mounted = $state(false);
-  const FULL_TEXT = 'Imagination | Unleashed';
+  const FULL_TEXT = 'Imagination, unbounded';
   const TYPEWRITER_PRE_DELAY_MS = 400;
   const TYPEWRITER_BASE_DELAY_MS = 110;
   const TYPEWRITER_JITTER_MS = 40;
@@ -224,7 +224,7 @@
 
     <!-- Phosphor — CRT typewriter subtitle -->
     <div class="mt-6 crt-subtitle-wrap">
-      <span class="sr-only">Imagination | Unleashed</span>
+      <span class="sr-only">Imagination, unbounded</span>
       <p class="crt-line text-xl tracking-[0.3em] uppercase" class:done={typingDone} aria-hidden="true">
         {displayedText}<span
           class="crt-cursor"
