@@ -48,10 +48,18 @@
 
 <div bind:this={rootEl} class={`section-label boot-label ${className}`.trim()}>
   <span class="boot-label-shell">
-    <span class="boot-label-layer" class:is-active={showInitializing}>
+    <span
+      class="boot-label-layer"
+      class:is-active={showInitializing}
+      aria-hidden={!showInitializing}
+    >
       // INITIALIZING...
     </span>
-    <span class="boot-label-layer" class:is-active={!showInitializing}>
+    <span
+      class="boot-label-layer"
+      class:is-active={!showInitializing}
+      aria-hidden={showInitializing}
+    >
       {label}
     </span>
   </span>
