@@ -2,13 +2,14 @@
   import { introState } from '$lib/intro-store.svelte.ts';
 
   type Phase = 'off' | 'line' | 'power-on' | 'static' | 'emerge' | 'clear' | 'done';
+  // Absolute intro timeline offsets in ms from animation start, not durations.
   const POWER_ON_START_MS   = 50;    // show the crt-power-line phase
-  const LINE_HOLD_MS        = 550;   // end of line phase (~500ms hold); begin overlay power-on collapse
-  const POWER_ON_EXPAND_MS  = 600;   // start expanding overlay to full screen
-  const STATIC_START_MS     = 820;   // static noise begins
-  const EMERGE_START_MS     = 1100;  // "THIS. IS. JK.com" emerges from static
-  const CLEAR_START_MS      = 1600;  // clear/fade the overlay
-  const DONE_START_MS       = 2100;  // intro complete
+  const LINE_HOLD_MS        = 550;   // absolute timestamp when the line phase ends and overlay power-on collapse begins
+  const POWER_ON_EXPAND_MS  = 600;   // absolute timestamp when the overlay starts expanding to full screen
+  const STATIC_START_MS     = 820;   // absolute timestamp when static noise begins
+  const EMERGE_START_MS     = 1100;  // absolute timestamp when "THIS. IS. JK.com" emerges from static
+  const CLEAR_START_MS      = 1600;  // absolute timestamp when the overlay clears/fades
+  const DONE_START_MS       = 2100;  // absolute timestamp when the intro is complete
   const SWEEP_BAR_SPEED = 4;
   const SWEEP_BAR_HEIGHT = 40;
   const STATIC_RESOLUTION_SCALE = 2;
