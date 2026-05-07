@@ -2,6 +2,7 @@
   // Hero.svelte — "THIS. IS. JK.com" — full-screen hero
   // Phosphor: glitch text, TV-intro handoff, CRT typewriter subtitle
   // Svelte 5 runes API
+  import { untrack } from 'svelte';
   import { openCalendlyPopup } from '$lib/calendly.ts';
   import { introState } from '$lib/intro-store.svelte.ts';
 
@@ -107,7 +108,12 @@
       }, TYPEWRITER_PRE_DELAY_MS);
     }
 
-    if (introState.done) {
+    // Use untrack so reading introState.done does not subscribe this effect to it.
+    // If introState is already done at mount, start immediately; otherwise the
+    // tv-intro-done event listener handles the async case. Without untrack, when
+    // introState.done flips to true the effect re-runs, its cleanup cancels the
+    // in-progress typing timeouts, and typewriterStarted prevents a restart.
+    if (untrack(() => introState.done)) {
       startTypewriter();
       return () => {
         if (preDelay !== undefined) clearTimeout(preDelay);
