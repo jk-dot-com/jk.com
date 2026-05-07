@@ -4,6 +4,7 @@
   import ShimmerToggle from '../ui/ShimmerToggle.svelte';
 
   const year = new Date().getFullYear();
+  // PUBLIC_BUILD_DATE is expected as YYYY-MM-DD in production; LOCAL keeps the footer readable in dev.
   const rawBuildDate = String(import.meta.env.PUBLIC_BUILD_DATE ?? '').trim();
   const buildDate = /^\d{4}-\d{2}-\d{2}$/.test(rawBuildDate)
     ? rawBuildDate.replace(/-/g, '.')

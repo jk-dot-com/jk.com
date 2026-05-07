@@ -81,6 +81,7 @@
         return;
       }
 
+      // Center a random delay adjustment in the [-TYPEWRITER_JITTER_MS, +TYPEWRITER_JITTER_MS] range.
       const jitter = (Math.random() * 2 - 1) * TYPEWRITER_JITTER_MS;
       typingTick = setTimeout(
         () => typeNext(nextIndex),
