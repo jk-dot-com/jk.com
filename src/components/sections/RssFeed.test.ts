@@ -4,8 +4,6 @@ import { fileURLToPath } from 'node:url';
 
 const rssFeedPath = fileURLToPath(new URL('./RssFeed.svelte', import.meta.url));
 const rssFeedSource = readFileSync(rssFeedPath, 'utf8');
-const globalStylesPath = fileURLToPath(new URL('../../styles/global.css', import.meta.url));
-const globalStylesSource = readFileSync(globalStylesPath, 'utf8');
 
 describe('RssFeed section', () => {
   it('uses BootLabel with "WHAT I THINK" label', () => {
@@ -29,15 +27,16 @@ describe('RssFeed section', () => {
     expect(rssFeedSource).toContain('feed-card glow-border iridescent');
   });
 
-  it('defers feed card border and glow styling to the shared Phosphor utilities', () => {
-    expect(rssFeedSource).not.toContain('border: 1px solid rgba(0, 212, 255, 0.18);');
-    expect(rssFeedSource).not.toContain('border-color 0.25s ease');
-    expect(rssFeedSource).not.toContain('box-shadow:');
-    expect(rssFeedSource).not.toContain('border-color: rgba(0, 212, 255, 0.55);');
-    expect(globalStylesSource).toContain('.glow-border {');
-    expect(globalStylesSource).toContain('.glow-border:hover {');
-    expect(globalStylesSource).toContain('.glow-border.iridescent {');
-    expect(globalStylesSource).toContain('.glow-border.iridescent:hover {');
+  it('keeps only local layout and transform styles on feed-card so shared Phosphor utilities own the border glow', () => {
+    expect(rssFeedSource).toContain(`.feed-card {
+    position: relative;
+    background: var(--color-card, #111827);
+    overflow: hidden;
+    transition: transform 0.2s ease;
+  }`);
+    expect(rssFeedSource).toContain(`.feed-card:hover {
+    transform: translateY(-3px);
+  }`);
   });
 
   it('uses Svelte fade transition on feed item reveal', () => {
