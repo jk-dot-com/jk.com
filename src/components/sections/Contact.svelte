@@ -1,6 +1,6 @@
 <script lang="ts">
   // Contact.svelte — "TALK TO ME" section
-  // Phosphor: BootLabel init, terminal-style form fields (> prompt prefix)
+  // Phosphor: terminal-style typography, monospace labels, iridescent contact panels
 
   import { openCalendlyPopup } from '$lib/calendly.ts';
   import { contactSchema, type ContactFormData } from '../../lib/schemas';
@@ -278,7 +278,7 @@
               style="position: absolute; left: -9999px; opacity: 0; height: 0;"
             />
 
-            <!-- Phosphor — terminal prompt form fields -->
+            <!-- Phosphor — terminal-style monospace contact fields -->
             <!-- Name + Company row -->
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <!-- Name -->

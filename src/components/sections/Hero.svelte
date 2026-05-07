@@ -1,6 +1,6 @@
 <script lang="ts">
   // Hero.svelte — "THIS. IS. JK.com" — full-screen hero
-  // Phosphor: glitch text, typewriter cursor, phosphor CRT glow on subtitle
+  // Phosphor: glitch text, scan accents, monospace CRT-style subtitle
   // Svelte 5 runes API
   import { openCalendlyPopup } from '$lib/calendly.ts';
 
@@ -110,7 +110,7 @@
       </div>
     </div>
 
-    <!-- Phosphor — typewriter + phosphor glow subtitle -->
+    <!-- Phosphor — monospace CRT-style subtitle -->
     <p
       class="mt-6 text-xl font-light tracking-[0.3em] uppercase"
       style="

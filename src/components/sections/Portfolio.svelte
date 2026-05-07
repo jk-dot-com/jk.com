@@ -1,6 +1,6 @@
 <script lang="ts">
   // Portfolio.svelte — "CLIENTS I ADORE" + featured work
-  // Phosphor: BootLabel init, signal-lock scanline sweep on card entry
+  // Phosphor: reveal-on-scroll case study cards, iridescent borders, client marquee
 
   // These are placeholder case studies — swap with actual client work
   const caseStudies = [
@@ -193,7 +193,7 @@
     box-shadow: 0 0 14px rgba(0, 212, 255, 0.2);
   }
 
-  /* Phosphor — signal lock scanline sweep on card entry */
+  /* Phosphor — clients marquee crawl */
   @keyframes marquee-left {
     from {
       transform: translateX(0);
