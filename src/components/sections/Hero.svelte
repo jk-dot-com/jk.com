@@ -15,6 +15,21 @@
   let cursorVisible = $state(false);
   let cursorBlinking = $state(false);
   let typingDone = $state(false);
+  let typewriterStarted = $state(false);
+  let prefersReducedMotion = $state(false);
+
+  $effect(() => {
+    if (typeof window === 'undefined') return;
+
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const syncPreference = () => {
+      prefersReducedMotion = mediaQuery.matches;
+    };
+
+    syncPreference();
+    mediaQuery.addEventListener('change', syncPreference);
+    return () => mediaQuery.removeEventListener('change', syncPreference);
+  });
 
   // Hero mounts its content after TV intro completes (or immediately if skipped)
   $effect(() => {
@@ -43,8 +58,6 @@
     let preDelay: ReturnType<typeof setTimeout> | undefined;
     let typingTick: ReturnType<typeof setTimeout> | undefined;
     let hideCursorDelay: ReturnType<typeof setTimeout> | undefined;
-    let started = false;
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function renderStaticLine() {
       displayedText = FULL_TEXT;
@@ -75,10 +88,10 @@
     }
 
     function startTypewriter() {
-      if (started) return;
-      started = true;
+      if (typewriterStarted || typingDone) return;
+      typewriterStarted = true;
 
-      if (reducedMotion) {
+      if (prefersReducedMotion) {
         renderStaticLine();
         return;
       }
@@ -211,8 +224,9 @@
     </div>
 
     <!-- Typewriter subtitle — "Imagination | Unleashed" -->
-    <div class="mt-6 crt-subtitle-wrap" aria-live="polite" aria-label="Imagination | Unleashed">
-      <p class="crt-line text-xl tracking-[0.3em] uppercase" class:done={typingDone}>
+    <div class="mt-6 crt-subtitle-wrap">
+      <span class="sr-only">Imagination | Unleashed</span>
+      <p class="crt-line text-xl tracking-[0.3em] uppercase" class:done={typingDone} aria-hidden="true">
         {displayedText}<span
           class="crt-cursor"
           class:blink={cursorBlinking}

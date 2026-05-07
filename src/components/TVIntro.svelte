@@ -10,6 +10,7 @@
   const DONE_START_MS = 1400;
   const SWEEP_BAR_SPEED = 4;
   const SWEEP_BAR_HEIGHT = 40;
+  const STATIC_RESOLUTION_SCALE = 2;
 
   let phase = $state<Phase>('off');
   let canvas = $state<HTMLCanvasElement | undefined>(undefined);
@@ -23,8 +24,7 @@
     document.dispatchEvent(new CustomEvent('tv-intro-done'));
   }
 
-  function drawNoise(ctx: CanvasRenderingContext2D, w: number, h: number, frame: number) {
-    const imageData = ctx.createImageData(w, h);
+  function drawNoise(ctx: CanvasRenderingContext2D, imageData: ImageData, w: number, h: number, frame: number) {
     const data = imageData.data;
     const blockSize = 3;
 
@@ -133,28 +133,50 @@
 
     let rafId: number | undefined;
     let frame = 0;
+    let noiseBuffer: ImageData | undefined;
+    let resizeRafId: number | undefined;
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const width = Math.max(1, Math.floor(window.innerWidth / STATIC_RESOLUTION_SCALE));
+      const height = Math.max(1, Math.floor(window.innerHeight / STATIC_RESOLUTION_SCALE));
+
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+        noiseBuffer = ctx.createImageData(width, height);
+      }
+    };
+
+    const handleResize = () => {
+      if (resizeRafId !== undefined) return;
+      resizeRafId = requestAnimationFrame(() => {
+        resizeRafId = undefined;
+        resize();
+      });
     };
 
     resize();
 
     const tick = () => {
-      drawNoise(ctx, canvas.width, canvas.height, frame);
+      if (!noiseBuffer || noiseBuffer.width !== canvas.width || noiseBuffer.height !== canvas.height) {
+        noiseBuffer = ctx.createImageData(canvas.width, canvas.height);
+      }
+      drawNoise(ctx, noiseBuffer, canvas.width, canvas.height, frame);
       frame += 1;
       rafId = requestAnimationFrame(tick);
     };
 
     tick();
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', handleResize);
 
     return () => {
       if (rafId !== undefined) {
         cancelAnimationFrame(rafId);
       }
-      window.removeEventListener('resize', resize);
+      if (resizeRafId !== undefined) {
+        cancelAnimationFrame(resizeRafId);
+      }
+      window.removeEventListener('resize', handleResize);
     };
   });
 </script>
@@ -228,6 +250,7 @@
     width: 100%;
     height: 100%;
     opacity: 1;
+    image-rendering: pixelated;
   }
 
   .scanlines {
