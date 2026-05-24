@@ -14,17 +14,28 @@
   let items = $state<FeedItem[]>([]);
   let loading = $state(true);
   let error = $state('');
+  const dateFormatter = new Intl.DateTimeFormat(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+  const formatDate = (pubDate: string) => {
+    if (!pubDate) {
+      return 'Date unavailable';
+    }
+
+    const parsedDate = new Date(pubDate);
+    if (Number.isNaN(parsedDate.getTime())) {
+      return 'Date unavailable';
+    }
+
+    return dateFormatter.format(parsedDate);
+  };
 
   const formattedItems = $derived(
     items.map((item) => ({
       ...item,
-      formattedDate: item.pubDate
-        ? new Date(item.pubDate).toLocaleDateString(undefined, {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          })
-        : 'Date unavailable',
+      formattedDate: formatDate(item.pubDate),
     }))
   );
 
@@ -33,6 +44,7 @@
     maxItems;
 
     let cancelled = false;
+    const abortController = new AbortController();
     loading = true;
     error = '';
     items = [];
@@ -45,7 +57,7 @@
       params.set('max', String(maxItems));
 
       try {
-        const response = await fetch(`/api/rss?${params.toString()}`);
+        const response = await fetch(`/api/rss?${params.toString()}`, { signal: abortController.signal });
         const payload = (await response.json()) as { items?: FeedItem[]; error?: string };
 
         if (!response.ok) {
@@ -56,6 +68,9 @@
           items = payload.items ?? [];
         }
       } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          return;
+        }
         console.error('[RssFeed] Failed to load feed:', err);
         if (!cancelled) {
           error = err instanceof Error ? err.message : 'Failed to load feed.';
@@ -71,6 +86,7 @@
 
     return () => {
       cancelled = true;
+      abortController.abort();
     };
   });
 </script>
@@ -225,6 +241,14 @@
 
   .feed-title-link:hover {
     color: var(--color-cyan, #00d4ff);
+  }
+
+  .feed-title-link:focus-visible,
+  .feed-read-more:focus-visible,
+  .view-all-link:focus-visible {
+    outline: 2px solid var(--color-cyan, #00d4ff);
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 
   /* ── Description ────────────────────────────────────── */

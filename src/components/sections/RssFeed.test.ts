@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url';
 
 const rssFeedPath = fileURLToPath(new URL('./RssFeed.svelte', import.meta.url));
 const rssFeedSource = readFileSync(rssFeedPath, 'utf8');
+const feedCardBlockMatch = rssFeedSource.match(/\.feed-card \{[\s\S]*?\}/);
+const feedCardBlock = feedCardBlockMatch?.[0] ?? '';
 
 describe('RssFeed section', () => {
   it('uses BootLabel with "WHAT I THINK" label', () => {
@@ -28,6 +30,7 @@ describe('RssFeed section', () => {
   });
 
   it('keeps only local layout and transform styles on feed-card so shared Phosphor utilities own the border glow', () => {
+    expect(feedCardBlockMatch).not.toBeNull();
     expect(rssFeedSource).toContain('.feed-card {');
     expect(rssFeedSource).toContain('position: relative;');
     expect(rssFeedSource).toContain('background: var(--color-card, #111827);');
@@ -35,9 +38,9 @@ describe('RssFeed section', () => {
     expect(rssFeedSource).toContain('transition: transform 0.2s ease;');
     expect(rssFeedSource).toContain('.feed-card:hover {');
     expect(rssFeedSource).toContain('transform: translateY(-3px);');
-    expect(rssFeedSource).not.toContain('border:');
-    expect(rssFeedSource).not.toContain('box-shadow:');
-    expect(rssFeedSource).not.toContain('border-color:');
+    expect(feedCardBlock).not.toContain('border:');
+    expect(feedCardBlock).not.toContain('box-shadow:');
+    expect(feedCardBlock).not.toContain('border-color:');
   });
 
   it('uses Svelte fade transition on feed item reveal', () => {
@@ -47,7 +50,9 @@ describe('RssFeed section', () => {
 
   it('derives formatted date strings from raw pubDate', () => {
     expect(rssFeedSource).toContain('formattedDate');
-    expect(rssFeedSource).toContain('toLocaleDateString');
+    expect(rssFeedSource).toContain('new Intl.DateTimeFormat');
+    expect(rssFeedSource).toContain('Number.isNaN(parsedDate.getTime())');
+    expect(rssFeedSource).toContain('dateFormatter.format(parsedDate)');
     expect(rssFeedSource).toContain("'Date unavailable'");
   });
 
