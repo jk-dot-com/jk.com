@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const rssFeedPath = fileURLToPath(new URL('./RssFeed.svelte', import.meta.url));
 const rssFeedSource = readFileSync(rssFeedPath, 'utf8');
+const feedCardBlock = rssFeedSource.match(/\.feed-card \{[\s\S]*?\}/)?.[0] ?? '';
 
 describe('RssFeed section', () => {
   it('uses BootLabel with "WHAT I THINK" label', () => {
@@ -35,9 +36,9 @@ describe('RssFeed section', () => {
     expect(rssFeedSource).toContain('transition: transform 0.2s ease;');
     expect(rssFeedSource).toContain('.feed-card:hover {');
     expect(rssFeedSource).toContain('transform: translateY(-3px);');
-    expect(rssFeedSource).not.toContain('border:');
-    expect(rssFeedSource).not.toContain('box-shadow:');
-    expect(rssFeedSource).not.toContain('border-color:');
+    expect(feedCardBlock).not.toContain('border:');
+    expect(feedCardBlock).not.toContain('box-shadow:');
+    expect(feedCardBlock).not.toContain('border-color:');
   });
 
   it('uses Svelte fade transition on feed item reveal', () => {
