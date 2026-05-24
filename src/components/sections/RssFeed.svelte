@@ -19,13 +19,23 @@
     month: 'short',
     day: 'numeric',
   });
+  const formatDate = (pubDate: string) => {
+    if (!pubDate) {
+      return 'Date unavailable';
+    }
+
+    const parsedDate = new Date(pubDate);
+    if (Number.isNaN(parsedDate.getTime())) {
+      return 'Date unavailable';
+    }
+
+    return dateFormatter.format(parsedDate);
+  };
 
   const formattedItems = $derived(
     items.map((item) => ({
       ...item,
-      formattedDate: item.pubDate
-        ? dateFormatter.format(new Date(item.pubDate))
-        : 'Date unavailable',
+      formattedDate: formatDate(item.pubDate),
     }))
   );
 

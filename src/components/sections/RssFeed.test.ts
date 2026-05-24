@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url';
 
 const rssFeedPath = fileURLToPath(new URL('./RssFeed.svelte', import.meta.url));
 const rssFeedSource = readFileSync(rssFeedPath, 'utf8');
-const feedCardBlock = rssFeedSource.match(/\.feed-card \{[\s\S]*?\}/)?.[0] ?? '';
+const feedCardBlockMatch = rssFeedSource.match(/\.feed-card \{[\s\S]*?\}/);
+const feedCardBlock = feedCardBlockMatch?.[0] ?? '';
 
 describe('RssFeed section', () => {
   it('uses BootLabel with "WHAT I THINK" label', () => {
@@ -29,6 +30,7 @@ describe('RssFeed section', () => {
   });
 
   it('keeps only local layout and transform styles on feed-card so shared Phosphor utilities own the border glow', () => {
+    expect(feedCardBlockMatch).not.toBeNull();
     expect(rssFeedSource).toContain('.feed-card {');
     expect(rssFeedSource).toContain('position: relative;');
     expect(rssFeedSource).toContain('background: var(--color-card, #111827);');
@@ -49,7 +51,8 @@ describe('RssFeed section', () => {
   it('derives formatted date strings from raw pubDate', () => {
     expect(rssFeedSource).toContain('formattedDate');
     expect(rssFeedSource).toContain('new Intl.DateTimeFormat');
-    expect(rssFeedSource).toContain('dateFormatter.format(new Date(item.pubDate))');
+    expect(rssFeedSource).toContain('Number.isNaN(parsedDate.getTime())');
+    expect(rssFeedSource).toContain('dateFormatter.format(parsedDate)');
     expect(rssFeedSource).toContain("'Date unavailable'");
   });
 
