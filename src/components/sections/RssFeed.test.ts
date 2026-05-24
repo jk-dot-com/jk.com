@@ -48,7 +48,8 @@ describe('RssFeed section', () => {
 
   it('derives formatted date strings from raw pubDate', () => {
     expect(rssFeedSource).toContain('formattedDate');
-    expect(rssFeedSource).toContain('toLocaleDateString');
+    expect(rssFeedSource).toContain('new Intl.DateTimeFormat');
+    expect(rssFeedSource).toContain('dateFormatter.format(new Date(item.pubDate))');
     expect(rssFeedSource).toContain("'Date unavailable'");
   });
 
