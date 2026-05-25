@@ -94,7 +94,7 @@
 <section id="blog-feed" class="section-pad" aria-labelledby="blog-feed-heading" style="background: var(--color-surface);">
   <div class="section-container">
     <BootLabel label="WHAT I THINK" class="animate-on-scroll" />
-    <div class="mb-10 animate-on-scroll flex items-end justify-between gap-4 flex-wrap">
+    <div class="mb-6 animate-on-scroll flex items-end justify-between gap-4 flex-wrap">
       <h2 id="blog-feed-heading" class="text-4xl font-bold mb-0 lg:text-5xl" style="font-family: var(--font-heading);">
         Latest <span class="gradient-text">Thoughts</span>
       </h2>
@@ -178,6 +178,12 @@
 </section>
 
 <style>
+  /* ── Section padding override (tighten desktop spacing) ─ */
+  section {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
   /* ── Card shell ─────────────────────────────────────── */
   .feed-card {
     position: relative;
@@ -258,6 +264,10 @@
     color: var(--color-text-dim, #94a3b8);
     margin-bottom: 1.25rem;
     flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   /* ── Read More CTA ──────────────────────────────────── */
