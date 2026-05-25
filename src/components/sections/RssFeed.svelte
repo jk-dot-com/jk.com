@@ -179,7 +179,7 @@
 
 <style>
   /* ── Section padding override (tighten desktop spacing) ─ */
-  section {
+  #blog-feed {
     padding-top: 4rem;
     padding-bottom: 4rem;
   }
