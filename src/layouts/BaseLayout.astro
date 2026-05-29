@@ -32,7 +32,6 @@ const seo = buildSeoMetadata({
 });
 const cfAnalyticsToken = import.meta.env.CLOUDFLARE_ANALYTICS_TOKEN;
 const shouldRenderTvIntro = Astro.url.pathname === '/';
-const shouldLoadCalendly = Astro.url.pathname === '/';
 ---
 
 <!doctype html>
@@ -93,14 +92,14 @@ const shouldLoadCalendly = Astro.url.pathname === '/';
 
     <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    {shouldLoadCalendly && <link rel="preconnect" href="https://assets.calendly.com" />}
+    <link rel="preconnect" href="https://assets.calendly.com" />
 
     <!-- Sitemap -->
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="me" href="https://github.com/jaypatrick" />
     <link rel="me" href="https://www.linkedin.com/in/jaysonknight" />
-    {shouldLoadCalendly && <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />}
-    {shouldLoadCalendly && <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>}
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
 
     <!-- JSON-LD structured data -->
     <script type="application/ld+json" set:html={JSON.stringify({
