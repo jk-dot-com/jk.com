@@ -195,7 +195,7 @@
     <!-- Section heading -->
     <div class="mb-12 animate-on-scroll">
       <h2 class="text-4xl font-bold mb-4 lg:text-5xl" style="font-family: var(--font-heading);">
-        What I <span class="gradient-text">Build</span> &amp; <span class="gradient-text">Consult</span>
+        What I <span class="gradient-text">Build</span> &amp; <span class="gradient-text">Advise</span>
       </h2>
       <p class="text-lg max-w-2xl" style="color: var(--color-text-dim);">
         From agentic AI platforms to cloud infrastructure and fractional CTO leadership — I partner with teams
