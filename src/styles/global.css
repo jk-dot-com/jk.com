@@ -442,6 +442,36 @@ html[data-shimmer-viewport-pause="true"] .iridescent:not(.shimmer-in-view)::afte
   .iridescent::after {
     animation: none;
   }
+  /* Suppress Tailwind bounce (used in Hero scroll indicator) */
+  .animate-bounce {
+    animation: none;
+  }
+}
+
+/* Phosphor — skip navigation link for keyboard users */
+.skip-link {
+  position: absolute;
+  top: -48px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  padding: 0.5rem 1.25rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-cyan);
+  color: var(--color-cyan);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  border-radius: 4px;
+  white-space: nowrap;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 8px;
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 2px;
 }
 
 /* ============================================================

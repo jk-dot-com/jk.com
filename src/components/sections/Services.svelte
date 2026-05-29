@@ -152,6 +152,28 @@
     expandedCreativeIndex = expandedCreativeIndex === index ? null : index;
   }
 
+  function handleTabKeydown(e: KeyboardEvent) {
+    const tabs: Array<'technical' | 'creative'> = ['technical', 'creative'];
+    const currentIdx = tabs.indexOf(activeTab);
+    let nextIdx: number | null = null;
+
+    if (e.key === 'ArrowRight') {
+      nextIdx = (currentIdx + 1) % tabs.length;
+    } else if (e.key === 'ArrowLeft') {
+      nextIdx = (currentIdx - 1 + tabs.length) % tabs.length;
+    } else if (e.key === 'Home') {
+      nextIdx = 0;
+    } else if (e.key === 'End') {
+      nextIdx = tabs.length - 1;
+    }
+
+    if (nextIdx !== null) {
+      e.preventDefault();
+      activeTab = tabs[nextIdx];
+      document.getElementById(`tab-${tabs[nextIdx]}`)?.focus();
+    }
+  }
+
   $effect(() => {
     activeTab;
 
@@ -204,7 +226,7 @@
     </div>
 
     <!-- Tab switcher -->
-    <div class="flex gap-2 mb-10 animate-on-scroll" role="tablist" aria-label="Services categories">
+    <div class="flex gap-2 mb-10 animate-on-scroll" role="tablist" aria-label="Services categories" onkeydown={handleTabKeydown}>
       <button
         id="tab-technical"
         class="btn {activeTab === 'technical' ? 'btn-primary' : 'btn-outline'}"

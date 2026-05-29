@@ -111,7 +111,7 @@
     {#if loading}
       <div role="status" aria-label="Loading blog posts" aria-live="polite">
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {#each Array.from({ length: 3 }) as _, i}
+          {#each Array.from({ length: maxItems }) as _, i}
             <div
               class="skeleton-card rounded-xl p-6 animate-pulse"
               style="transition-delay: {i * 0.05}s;"
