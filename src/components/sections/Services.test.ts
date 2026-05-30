@@ -14,10 +14,16 @@ describe('Services section', () => {
   it('implements accessible tab switcher for Technical / Creative categories', () => {
     expect(servicesSource).toContain('role="tablist"');
     expect(servicesSource).toContain('aria-label="Services categories"');
+    expect(servicesSource).toContain('onkeydown={handleTabKeydown}');
     expect(servicesSource).toContain('role="tab"');
     expect(servicesSource).toContain('aria-selected');
     expect(servicesSource).toContain('aria-controls');
     expect(servicesSource).toContain('activeTab');
+    expect(servicesSource).toContain('handleTabKeydown');
+    expect(servicesSource).toContain("e.key === 'ArrowRight'");
+    expect(servicesSource).toContain("e.key === 'ArrowLeft'");
+    expect(servicesSource).toContain("e.key === 'Home'");
+    expect(servicesSource).toContain("e.key === 'End'");
     expect(servicesSource).toContain('tab-technical');
     expect(servicesSource).toContain('tab-creative');
   });

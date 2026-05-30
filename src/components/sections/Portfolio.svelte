@@ -242,6 +242,10 @@
       animation: none;
       opacity: 0;
     }
+
+    .clients-track {
+      animation: none;
+    }
   }
 
   /* Phosphor — clients marquee crawl */

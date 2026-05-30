@@ -92,6 +92,7 @@ const shouldRenderTvIntro = Astro.url.pathname === '/';
 
     <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://assets.calendly.com" />
 
     <!-- Sitemap -->
     <link rel="sitemap" href="/sitemap-index.xml" />
@@ -134,6 +135,7 @@ const shouldRenderTvIntro = Astro.url.pathname === '/';
   </head>
 
   <body class="grid-overlay">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     {shouldRenderTvIntro && <TVIntro client:load />}
 
     <!-- Subtle scan-line overlay (CSS only) -->
@@ -239,6 +241,13 @@ const shouldRenderTvIntro = Astro.url.pathname === '/';
         }
 
         observeShimmerRoot(document);
+
+        // Enable viewport-pause behavior now that initial elements have been observed.
+        // rAF defers until after the first IO callback fires, so already-visible
+        // elements have .shimmer-in-view before the pause takes effect.
+        requestAnimationFrame(() => {
+          document.documentElement.dataset.shimmerViewportPause = 'true';
+        });
 
         // Catch dynamically-added tiles (e.g. RssFeed mounts async)
         const mutationObs = new MutationObserver(scheduleObserveAddedNodes);

@@ -359,12 +359,13 @@
                     required
                     autocomplete="name"
                     aria-invalid={fieldErrors.name ? 'true' : 'false'}
+                    aria-describedby={fieldErrors.name ? 'contact-name-error' : undefined}
                     placeholder="Jane Smith"
                     class="terminal-input"
                   />
                 </div>
                 {#if fieldErrors.name}
-                  <p role="alert" class="mt-1 text-xs" style="color: var(--color-red);">{fieldErrors.name}</p>
+                  <p id="contact-name-error" role="alert" class="mt-1 text-xs" style="color: var(--color-red);">{fieldErrors.name}</p>
                 {/if}
               </div>
 
@@ -402,12 +403,13 @@
                   autocomplete="email"
                   inputmode="email"
                   aria-invalid={fieldErrors.email ? 'true' : 'false'}
+                  aria-describedby={fieldErrors.email ? 'contact-email-error' : undefined}
                   placeholder="jane@company.com"
                   class="terminal-input"
                 />
               </div>
               {#if fieldErrors.email}
-                <p role="alert" class="mt-1 text-xs" style="color: var(--color-red);">{fieldErrors.email}</p>
+                <p id="contact-email-error" role="alert" class="mt-1 text-xs" style="color: var(--color-red);">{fieldErrors.email}</p>
               {/if}
             </div>
 
@@ -425,12 +427,13 @@
                   required
                   rows={5}
                   aria-invalid={fieldErrors.message ? 'true' : 'false'}
+                  aria-describedby={fieldErrors.message ? 'contact-message-error' : undefined}
                   placeholder="Tell me about your consulting or architecture design needs, timeline, and budget..."
                   class="terminal-input terminal-input-textarea"
                 ></textarea>
               </div>
               {#if fieldErrors.message}
-                <p role="alert" class="mt-1 text-xs" style="color: var(--color-red);">{fieldErrors.message}</p>
+                <p id="contact-message-error" role="alert" class="mt-1 text-xs" style="color: var(--color-red);">{fieldErrors.message}</p>
               {/if}
             </div>
 
