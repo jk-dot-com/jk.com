@@ -241,7 +241,7 @@
         <!-- Contact details -->
         <div class="space-y-6 mb-6">
           <a
-            href="tel:+19807297877"
+            href="tel:+17044082471"
             class="flex items-center gap-4 group"
             style="text-decoration: none;"
           >
@@ -252,7 +252,7 @@
             ><span style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--color-cyan); letter-spacing: 0.05em;">TEL</span></div>
             <div>
               <div class="text-xs mb-0.5 font-mono uppercase tracking-widest" style="color: var(--color-text-ghost);">Phone</div>
-              <div class="text-lg font-medium group-hover:text-cyan transition-colors" style="color: var(--color-text);">980.729.7877</div>
+              <div class="text-lg font-medium group-hover:text-cyan transition-colors" style="color: var(--color-text);">704.408.2471</div>
             </div>
           </a>
 
