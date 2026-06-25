@@ -22,9 +22,9 @@
     "@emdash-cms/cloudflare": "^0.17.1",
     "@fontsource/space-grotesk": "^5.2.10",
     "@resvg/resvg-wasm": "^2.6.2",
-    "astro": "^6.3.2",
+    "astro": "^6.4.8",
     "emdash": "^0.17.1",
-    "hono": "^4.12.23",
+    "hono": "^4.12.27",
     "satori": "^0.26.0",
     "shiki": "^4.0.2",
     "svelte": "^5.55.9",
@@ -35,7 +35,7 @@
     "@tailwindcss/vite": "^4.2.2",
     "typescript": "^5.7.0",
     "vitest": "^4.1.4",
-    "wrangler": "^4.94.0"
+    "wrangler": "^4.105.0"
   },
   "engines": {
     "node": ">=24"
