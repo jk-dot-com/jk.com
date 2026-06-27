@@ -7,20 +7,20 @@
 		"nodejs_compat"
 	],
 	// D1 Database — used by EmDash for blog CMS
-	"d1_databases": [
+	/* "d1_databases": [
 		{
 			"binding": "jk_emdash",
 			"database_name": "jk-emdash",
 			"database_id": "c6beff50-d286-44e0-b6d1-522a102c975c",
 		},
-	],
+	], */
 	// R2 Bucket — used by EmDash for media uploads
-	"r2_buckets": [
+	/* "r2_buckets": [
 		{
 			"bucket_name": "jk-media",
 			"binding": "jk_media",
 		},
-	],
+	], */
 	// KV Namespace — for edge caching and session data
 	"kv_namespaces": [
 		{
