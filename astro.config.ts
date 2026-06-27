@@ -9,7 +9,7 @@ import { d1, r2 } from '@emdash-cms/cloudflare';
 const cloudflareAdapterOptions: Parameters<typeof cloudflare>[0] & { compatibilityDate: string } = {
   // Keep this date in sync with `wrangler.jsonc`'s `compatibility_date`.
   // Both are currently pinned intentionally until deployment config is consolidated.
-  compatibilityDate: '2025-01-01',
+  compatibilityDate: '2026-04-01',
   imageService: 'passthrough',
 };
 
