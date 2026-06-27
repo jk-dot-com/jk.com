@@ -22,10 +22,10 @@ export default defineConfig({
 
   integrations: [
     svelte(),
-    emdash({
-      database: d1({ binding: 'jk_emdash' }),
-      storage: r2({ binding: 'jk_media' }),
-    }),
+    // emdash({
+      // database: d1({ binding: 'jk_emdash' }),
+      // storage: r2({ binding: 'jk_media' }),
+    // }),
   ],
 
   // Vite 8 with Rolldown (Rust compiler) — enabled by default in Astro 6
