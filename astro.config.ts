@@ -28,7 +28,7 @@ export default defineConfig({
     // }),
   ],
 
-  // Vite 8 with Rolldown (Rust compiler) — enabled by default in Astro 6
+  // Vite 7 with Rolldown (Rust bundler) — enabled by default in Astro 6
   vite: {
     plugins: [tailwindcss()],
     resolve: {
@@ -38,6 +38,13 @@ export default defineConfig({
     },
     build: {
       rollupOptions: {},
+    },
+    optimizeDeps: {
+      // Exclude astro from dep pre-bundling so esbuild never processes its
+      // virtual-module imports (virtual:astro:*, astro:asset-imports, etc.),
+      // which fail with esbuild >=0.28.  Rolldown (Vite 7 default) handles
+      // these correctly through Astro's Vite plugin layer at build time.
+      exclude: ['astro'],
     },
   },
 
