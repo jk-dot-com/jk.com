@@ -40,10 +40,11 @@ export default defineConfig({
       rollupOptions: {},
     },
     optimizeDeps: {
-      // Force Rolldown for dep optimization (Vite 7 default).
-      // Without this, a plugin setting esbuildOptions causes Vite to fall back
-      // to esbuild, which fails to resolve Astro virtual modules in esbuild >=0.28.
-      rolldownOptions: {},
+      // Exclude astro from dep pre-bundling so esbuild never processes its
+      // virtual-module imports (virtual:astro:*, astro:asset-imports, etc.),
+      // which fail with esbuild >=0.28.  Rolldown (Vite 7 default) handles
+      // these correctly through Astro's Vite plugin layer at build time.
+      exclude: ['astro'],
     },
   },
 
