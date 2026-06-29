@@ -8,7 +8,6 @@ import { d1, r2 } from '@emdash-cms/cloudflare';
 
 const cloudflareAdapterOptions: Parameters<typeof cloudflare>[0] & { compatibilityDate: string } = {
   // Keep this date in sync with `wrangler.jsonc`'s `compatibility_date`.
-  // Both are currently pinned intentionally until deployment config is consolidated.
   compatibilityDate: '2026-04-01',
   imageService: 'passthrough',
 };
@@ -17,7 +16,6 @@ const cloudflareAdapterOptions: Parameters<typeof cloudflare>[0] & { compatibili
 export default defineConfig({
   output: 'server',
 
-  // Astro 6 uses workerd runtime natively — no platformProxy config needed
   adapter: cloudflare(cloudflareAdapterOptions),
 
   integrations: [
@@ -28,7 +26,11 @@ export default defineConfig({
     // }),
   ],
 
-  // Vite 7 with Rolldown (Rust bundler) — enabled by default in Astro 6
+  // Astro 7: JSX-style whitespace compression is now the default.
+  // 'jsx' strips inter-element whitespace; use false to keep all whitespace.
+  compressHTML: 'jsx',
+
+  // Vite 8 (bundled with Astro 7) — Rolldown Rust bundler enabled by default
   vite: {
     plugins: [tailwindcss()],
     resolve: {
@@ -39,16 +41,9 @@ export default defineConfig({
     build: {
       rollupOptions: {},
     },
-    optimizeDeps: {
-      // Exclude astro from dep pre-bundling so esbuild never processes its
-      // virtual-module imports (virtual:astro:*, astro:asset-imports, etc.),
-      // which fail with esbuild >=0.28.  Rolldown (Vite 7 default) handles
-      // these correctly through Astro's Vite plugin layer at build time.
-      exclude: ['astro'],
-    },
   },
 
-  // Built-in Fonts API (stable in Astro 6)
+  // Built-in Fonts API
   fonts: [
     {
       provider: fontProviders.google(),

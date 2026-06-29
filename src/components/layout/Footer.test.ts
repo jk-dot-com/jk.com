@@ -54,7 +54,7 @@ describe('Footer component', () => {
 
   it('includes a "built with" tech stack block', () => {
     expect(footerSource).toContain('// built with');
-    expect(footerSource).toContain('Astro 6');
+    expect(footerSource).toContain('Astro 7');
     expect(footerSource).toContain('Svelte 5');
     expect(footerSource).toContain('Cloudflare');
   });

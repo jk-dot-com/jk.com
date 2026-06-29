@@ -108,7 +108,7 @@
           style="background: var(--color-card); border: 1px solid var(--color-border); font-family: var(--font-mono); color: var(--color-text-ghost); line-height: 1.8;"
         >
           <span style="color: var(--color-cyan-dim);">// built with</span><br/>
-          Astro 6 · Svelte 5 · Cloudflare<br/>
+          Astro 7 · Svelte 5 · Cloudflare<br/>
           EmDash · Hono · TailwindCSS v4
         </div>
       </div>
