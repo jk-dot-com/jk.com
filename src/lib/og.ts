@@ -3,7 +3,7 @@ import { Resvg, initWasm } from '@resvg/resvg-wasm';
 
 // Serve the WASM binary and fonts from the same Cloudflare ASSETS origin rather
 // than bundling WASM into the Worker script.  Bundling via the ?module Vite hint
-// fails silently under Rolldown (Astro 6 / Vite 8), causing initWasm() to throw
+// fails silently under Rolldown (Astro 7 / Vite 8), causing initWasm() to throw
 // and the endpoint to return text/plain instead of image/png.
 const DEFAULT_SITE_ORIGIN = import.meta.env.SITE ?? 'https://jaysonknight.com';
 

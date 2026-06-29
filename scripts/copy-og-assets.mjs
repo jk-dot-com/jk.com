@@ -13,7 +13,7 @@ try {
 
   // Ship the resvg WASM as a static asset so it is served by Cloudflare's ASSETS
   // binding rather than bundled into the Worker script. This sidesteps a Rolldown
-  // (Vite 8 / Astro 6) limitation where the ?module WASM import hint does not
+  // (Vite 8 / Astro 7) limitation where the ?module WASM import hint does not
   // produce a valid WebAssembly.Module in the Cloudflare Workers runtime.
   mkdirSync('public/wasm', { recursive: true });
   copyFileSync(

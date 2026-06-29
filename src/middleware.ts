@@ -22,7 +22,7 @@ const securityHeaders = defineMiddleware(async ({ url }, next) => {
   );
 
   // Content Security Policy
-  // This complements the Astro 6 built-in CSP (astro.config.ts contentSecurityPolicy).
+  // This complements the Astro 7 built-in CSP (astro.config.ts contentSecurityPolicy).
   // If CSP is not fully handled by Astro, this middleware ensures it's always set.
   const isHtml = (newResponse.headers.get('content-type') ?? '').includes('text/html');
   if (isHtml) {

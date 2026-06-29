@@ -8,17 +8,17 @@ Personal site and blog for [Jayson Knight](https://jaysonknight.com), built on a
 
 | Layer | Technology |
 |---|---|
-| **Framework** | [Astro 6](https://astro.build) — server-rendered, edge-optimised |
+| **Framework** | [Astro 7](https://astro.build) — server-rendered, edge-optimised |
 | **UI Components** | [Svelte 5](https://svelte.dev) |
 | **Styling** | [Tailwind CSS 4](https://tailwindcss.com) |
-| **Language** | TypeScript 5 |
+| **Language** | TypeScript 6 |
 | **Runtime / Deploy** | [Cloudflare Workers](https://workers.cloudflare.com) (via `@astrojs/cloudflare`) |
 | **CMS** | [EmDash](https://emdash.dev) — headless blog CMS for Astro |
 | **Database** | Cloudflare D1 (SQLite at the edge) |
 | **Media Storage** | Cloudflare R2 |
 | **Edge Cache / Sessions** | Cloudflare KV |
 | **Analytics** | Cloudflare Analytics Engine |
-| **Build tooling** | Vite 8 w/ Rolldown (Rust compiler, default in Astro 6) |
+| **Build tooling** | Vite 8 w/ Rolldown (Rust compiler, default in Astro 7) |
 | **Fonts** | Google Fonts via Astro's built-in Fonts API (Space Grotesk, JetBrains Mono) |
 | **API layer** | [Hono](https://hono.dev) |
 | **Validation** | [Zod 4](https://zod.dev) |
