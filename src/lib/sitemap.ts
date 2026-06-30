@@ -36,7 +36,7 @@ export const buildUrlsetXml = (pages: SitemapPage[], site: URL, lastmod: string)
     .map(
       (page) => `  <url>
     <loc>${escapeXml(new URL(page.path, site).href)}</loc>
-    <lastmod>${lastmod}</lastmod>
+    <lastmod>${escapeXml(lastmod)}</lastmod>
     <changefreq>${page.changeFrequency}</changefreq>
     <priority>${page.priority.toFixed(1)}</priority>
   </url>`
@@ -60,7 +60,7 @@ export const buildSitemapIndexXml = (entries: SitemapIndexEntry[], site: URL): s
     .map(
       (entry) => `  <sitemap>
     <loc>${escapeXml(new URL(entry.path, site).href)}</loc>
-    <lastmod>${entry.lastmod}</lastmod>
+    <lastmod>${escapeXml(entry.lastmod)}</lastmod>
   </sitemap>`
     )
     .join('\n');
