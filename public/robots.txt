@@ -4,4 +4,8 @@ Allow: /
 # Don't index EmDash admin
 Disallow: /_emdash/
 
+# API endpoints and generated images carry no indexable content
+Disallow: /api/
+Disallow: /og-image.png
+
 Sitemap: https://jaysonknight.com/sitemap-index.xml
