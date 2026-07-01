@@ -1,0 +1,4 @@
+[submodule "vendor/phosphorous"]
+	path = vendor/phosphorous
+	url = https://github.com/jk-dot-com/jk.com-design-system.git
+	branch = main
