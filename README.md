@@ -32,6 +32,12 @@ The blog is powered by **EmDash**, a headless CMS built for Astro. Content is st
 
 ---
 
+## Content Conventions
+
+No emoji in copy, UI chrome, or documentation — icons use the mono-glyph system (`▸ ▾ • → █`) documented in the [Phosphorous design system](https://github.com/jk-dot-com/jk.com-design-system). Adding emoji anywhere in this repo requires explicit approval via a GitHub issue or PR.
+
+---
+
 ## Getting Started
 
 ```bash

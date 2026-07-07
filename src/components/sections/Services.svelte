@@ -15,7 +15,7 @@
 
   const technicalServices: Service[] = [
     {
-      icon: '☁️',
+      icon: '▸',
       title: 'Azure Solutions Architecture',
       description:
         'End-to-end Azure platform design: landing zones, AKS clusters, networking, identity (Entra ID / AAD), cost optimization, and FinOps. I speak fluent ARM, Bicep, and Terraform.',
@@ -27,7 +27,7 @@
       ],
     },
     {
-      icon: '⚡',
+      icon: '▸',
       title: '.NET & TypeScript/Deno Modernization',
       description:
         'Migrate legacy .NET Framework apps to .NET 9/10, and build greenfield TypeScript services with Deno and Deno Deploy. Architect minimal APIs, Blazor frontends, Orleans distributed systems, and cloud-native patterns on Azure.',
@@ -39,7 +39,7 @@
       ],
     },
     {
-      icon: '🤖',
+      icon: '▸',
       title: 'AI Architecture & Agentic Systems',
       description:
         'End-to-end agentic AI workflow design and implementation — multi-agent orchestration, MCP servers, AI gateways, and Agentic Development Environments (ADEs). Built on Anthropic Claude and deployable to the Cloudflare edge. Real production experience includes Bloqr, an AI-native publishing platform, and enterprise agentic pipelines.',
@@ -52,7 +52,7 @@
       ],
     },
     {
-      icon: '🦀',
+      icon: '▸',
       title: 'Rust & WebAssembly',
       description:
         'Deep Rust expertise across the full stack — standalone systems programming, server-side WASM with WASI/component model, and client-side WASM in both Rust and TypeScript.',
@@ -64,7 +64,7 @@
       ],
     },
     {
-      icon: '🔶',
+      icon: '▸',
       title: 'Cloudflare Platform',
       description:
         'Full Cloudflare stack implementation: Workers, D1, R2, KV, Queues, Zero Trust / SASE, AI Gateway, MCP servers, and Vectorize. I\'m an expert-level practitioner — this entire site runs on Cloudflare.',
@@ -76,7 +76,7 @@
       ],
     },
     {
-      icon: '🔒',
+      icon: '▸',
       title: 'Privacy & Security Engineering',
       description:
         'Zero-trust architectures, DNS encryption (DoH/DoT), SASE deployment, security-first SDLC practices, and compliance-ready infrastructure design.',
@@ -88,7 +88,7 @@
       ],
     },
     {
-      icon: '🌐',
+      icon: '▸',
       title: 'Enterprise Networking',
       description:
         'Hardware and software network architecture at enterprise scale — SD-WAN, BGP, UniFi/Ubiquiti deployments, Cloudflare Tunnel, and secure remote access.',
@@ -100,7 +100,7 @@
       ],
     },
     {
-      icon: '🛠️',
+      icon: '▸',
       title: 'Technical Advisory & Fractional CTO',
       description:
         'Fractional CTO services for startups and scale-ups that need senior technical leadership without the full-time overhead. I embed with your team to own the technical roadmap, make build-vs-buy decisions, establish engineering standards, and translate product vision into executable architecture — then step back when you\'re ready to hire full-time.',
@@ -116,7 +116,7 @@
 
   const creativeServices: Service[] = [
     {
-      icon: '🎨',
+      icon: '▸',
       title: 'Digital Media & Web Design',
       description: 'Modern, performant web experiences with a strong visual identity. From brand design to full-stack Astro/Svelte builds.',
       tags: ['Astro', 'Svelte', 'Design', 'Brand'],
@@ -127,7 +127,7 @@
       ],
     },
     {
-      icon: '🔗',
+      icon: '▸',
       title: 'Microsoft 365 & Teams',
       description: 'M365 tenant architecture, Teams customization, SharePoint, and OneDrive deployment with governance best practices.',
       tags: ['M365', 'Teams', 'SharePoint'],
@@ -384,7 +384,7 @@
         class="iridescent rounded-xl p-6 sm:col-span-2 animate-on-scroll"
         style="background: linear-gradient(135deg, rgba(0,120,212,0.1) 0%, rgba(0,212,255,0.05) 100%); border: 1px solid rgba(0,120,212,0.25);"
       >
-        <div class="text-3xl mb-3" aria-hidden="true">🧪</div>
+        <div class="text-3xl mb-3" aria-hidden="true">▸</div>
         <h3 class="text-lg font-semibold mb-2" style="font-family: var(--font-heading);">Labs & Open Source</h3>
         <p class="text-sm mb-4" style="color: var(--color-text-dim);">
           Side projects include an Adblock Compiler (compiler-as-a-service for filter lists),
