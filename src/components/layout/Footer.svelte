@@ -26,7 +26,7 @@
   ];
 </script>
 
-<footer role="contentinfo" style="background: var(--color-surface); border-top: 1px solid var(--color-border);">
+<footer role="contentinfo" style="background: var(--color-surface); border-top: 1px solid var(--color-border); margin-top: 4rem;">
   <div class="section-container py-12">
     <div class="grid grid-cols-1 gap-10 md:grid-cols-3 items-start mb-10">
 
