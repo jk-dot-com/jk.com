@@ -1,16 +1,34 @@
 {
-  "name": "JK.com API catalog",
-  "description": "Public machine-readable catalog for JK.com services.",
-  "resources": [
+  "linkset": [
     {
-      "name": "RSS feed proxy",
-      "url": "/api/rss",
-      "description": "Fetch and parse a public RSS or Atom feed by URL."
+      "anchor": "https://jaysonknight.com/api/rss",
+      "service-desc": [
+        {
+          "href": "https://jaysonknight.com/api-docs/rss-openapi.json",
+          "type": "application/vnd.oai.openapi+json;version=3.0"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://jaysonknight.com/api-docs/rss.md",
+          "type": "text/markdown"
+        }
+      ]
     },
     {
-      "name": "Contact endpoint",
-      "url": "/api/contact",
-      "description": "Submit a contact inquiry. This endpoint is not an agent-registration endpoint."
+      "anchor": "https://jaysonknight.com/api/contact",
+      "service-desc": [
+        {
+          "href": "https://jaysonknight.com/api-docs/contact-openapi.json",
+          "type": "application/vnd.oai.openapi+json;version=3.0"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://jaysonknight.com/api-docs/contact.md",
+          "type": "text/markdown"
+        }
+      ]
     }
   ]
 }

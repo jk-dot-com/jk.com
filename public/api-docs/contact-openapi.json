@@ -1,0 +1,38 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "JK.com contact API",
+    "version": "1.0.0",
+    "description": "Submit a consulting inquiry to JK.com. This endpoint is not agent registration."
+  },
+  "servers": [{ "url": "https://jaysonknight.com" }],
+  "paths": {
+    "/api/contact": {
+      "post": {
+        "summary": "Submit a contact inquiry",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "email", "message"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "company": { "type": "string" },
+                  "message": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Inquiry accepted" },
+          "400": { "description": "Invalid JSON" },
+          "422": { "description": "Validation failed" }
+        }
+      }
+    }
+  }
+}

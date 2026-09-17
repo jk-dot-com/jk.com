@@ -19,6 +19,11 @@ const securityHeaders = defineMiddleware(async ({ request, url }, next) => {
     newResponse.headers.append('Link', '</auth.md>; rel="describedby"');
   }
 
+  // Static extensionless discovery documents need an explicit media type.
+  if (url.pathname === '/.well-known/api-catalog') {
+    newResponse.headers.set('Content-Type', 'application/linkset+json');
+  }
+
   // Core security headers
   newResponse.headers.set('X-Content-Type-Options', 'nosniff');
   newResponse.headers.set('X-Frame-Options', 'DENY');

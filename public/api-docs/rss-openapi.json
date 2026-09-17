@@ -1,0 +1,47 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "JK.com RSS feed proxy",
+    "version": "1.0.0",
+    "description": "Fetch and parse a public RSS or Atom feed."
+  },
+  "servers": [{ "url": "https://jaysonknight.com" }],
+  "paths": {
+    "/api/rss": {
+      "get": {
+        "summary": "Fetch an RSS or Atom feed",
+        "parameters": [
+          { "name": "url", "in": "query", "required": true, "schema": { "type": "string", "format": "uri" } },
+          { "name": "max", "in": "query", "required": false, "schema": { "type": "integer", "minimum": 1, "maximum": 20, "default": 5 } }
+        ],
+        "responses": {
+          "200": { "description": "Parsed feed items", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FeedResponse" } } } },
+          "400": { "description": "Missing or invalid feed URL" },
+          "500": { "description": "Unable to fetch feed" },
+          "502": { "description": "Upstream feed failure" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "FeedResponse": {
+        "type": "object",
+        "required": ["items"],
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/FeedItem" } }
+        }
+      },
+      "FeedItem": {
+        "type": "object",
+        "required": ["title", "link", "pubDate", "description"],
+        "properties": {
+          "title": { "type": "string" },
+          "link": { "type": "string", "format": "uri" },
+          "pubDate": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      }
+    }
+  }
+}
