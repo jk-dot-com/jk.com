@@ -1,4 +1,3 @@
-[submodule "vendor/phosphorous"]
-	path = vendor/phosphorous
-	url = https://github.com/jk-dot-com/jk.com-design-system.git
-	branch = main
+# This project does not currently use git submodules.
+# The previous submodule entry was removed because the referenced repository
+# no longer exists, which caused GitHub Actions checkout to fail.
