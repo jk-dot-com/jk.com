@@ -1,0 +1,10 @@
+{
+  "service": "JK.com",
+  "description": "JK.com consulting website, living résumé, and blog.",
+  "documentation": "https://jaysonknight.com/auth.md",
+  "catalog": "https://jaysonknight.com/.well-known/api-catalog",
+  "authentication": {
+    "oauth": false,
+    "agent_registration": "manual"
+  }
+}

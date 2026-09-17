@@ -1,11 +1,23 @@
 import { defineMiddleware, sequence } from 'astro:middleware';
 
 // Security headers middleware — defense-in-depth CSP + hardening
-const securityHeaders = defineMiddleware(async ({ url }, next) => {
+const securityHeaders = defineMiddleware(async ({ request, url }, next) => {
   const response = await next();
 
   // Clone the response to add headers
   const newResponse = new Response(response.body, response);
+
+  // Advertise machine-readable service resources from the homepage. Keep these
+  // links on the homepage only so crawlers have a stable discovery entrypoint.
+  if (url.pathname === '/' && request.method !== 'OPTIONS') {
+    newResponse.headers.append('Link', '</.well-known/api-catalog>; rel="api-catalog"');
+    newResponse.headers.append(
+      'Link',
+      '</.well-known/service-description>; rel="service-desc"'
+    );
+    newResponse.headers.append('Link', '</auth.md>; rel="service-doc"');
+    newResponse.headers.append('Link', '</auth.md>; rel="describedby"');
+  }
 
   // Core security headers
   newResponse.headers.set('X-Content-Type-Options', 'nosniff');

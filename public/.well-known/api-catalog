@@ -1,0 +1,16 @@
+{
+  "name": "JK.com API catalog",
+  "description": "Public machine-readable catalog for JK.com services.",
+  "resources": [
+    {
+      "name": "RSS feed proxy",
+      "url": "/api/rss",
+      "description": "Fetch and parse a public RSS or Atom feed by URL."
+    },
+    {
+      "name": "Contact endpoint",
+      "url": "/api/contact",
+      "description": "Submit a contact inquiry. This endpoint is not an agent-registration endpoint."
+    }
+  ]
+}
