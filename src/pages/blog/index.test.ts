@@ -16,7 +16,7 @@ describe('/blog page', () => {
     const rssFeedTag = blogPageSource.match(/<RssFeed\b[^>]*\/>/)?.[0];
     expect(rssFeedTag).toBeDefined();
     expect(rssFeedTag).toMatch(/\bclient:load\b/);
-    expect(rssFeedTag).toMatch(/\bfeedUrl="https:\/\/blog\.jaysonknight\.com\/feed\/"/);
+    expect(rssFeedTag).toMatch(/\bfeedUrl="https:\/\/blog\.jaysonknight\.com\/rss\.xml"/);
     expect(rssFeedTag).toMatch(/\bmaxItems=\{10\}/);
   });
 });

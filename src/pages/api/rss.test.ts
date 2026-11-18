@@ -7,7 +7,7 @@ const GHOST_RSS_FIXTURE = `<?xml version="1.0" encoding="UTF-8"?>
     <title><![CDATA[Jayson Knight's Blog]]></title>
     <description><![CDATA[Thoughts on Azure, AI, and Cloudflare]]></description>
     <link>https://blog.jaysonknight.com</link>
-    <atom:link href="https://blog.jaysonknight.com/feed/" rel="self" type="application/rss+xml"/>
+    <atom:link href="https://blog.jaysonknight.com/rss.xml" rel="self" type="application/rss+xml"/>
     <lastBuildDate>Mon, 20 Apr 2026 00:00:00 GMT</lastBuildDate>
     <ttl>60</ttl>
     <item>
@@ -266,7 +266,7 @@ describe('GET /api/rss', () => {
     );
 
     const response = await GET({
-      request: new Request('https://example.com/api/rss?url=https%3A%2F%2Fblog.jaysonknight.com%2Ffeed%2F&max=5'),
+      request: new Request('https://example.com/api/rss?url=https%3A%2F%2Fblog.jaysonknight.com%2Frss.xml&max=5'),
     } as Parameters<typeof GET>[0]);
     const payload = (await response.json()) as { items: Array<{ title: string; link: string; description: string }> };
 
@@ -280,7 +280,7 @@ describe('GET /api/rss', () => {
     expect(payload.items[1].title).toBe('Rust on the Edge: WASM Components with WASI');
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://blog.jaysonknight.com/feed/',
+      'https://blog.jaysonknight.com/rss.xml',
       expect.objectContaining({
         cache: 'no-store',
         signal: expect.any(AbortSignal),
@@ -342,157 +342,30 @@ describe('GET /api/rss', () => {
     expect(payload).toEqual({ items: [] });
   });
 
-  it('returns 200 with posts from WordPress.com public API as primary strategy', async () => {
-    const wpComPayload = {
-      posts: [
-        {
-          ID: 1,
-          title: 'Edge-First Architecture',
-          URL: 'https://blog.jaysonknight.com/2026/03/26/edge-first-architecture/',
-          date: '2026-03-27T02:43:10+00:00',
-          excerpt: '<p>Cloudflare&#8217;s distributed model...</p>',
-          content: '<p>Full content.</p>',
-        },
-      ],
-    };
-
-    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
-      new Response(JSON.stringify(wpComPayload), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json; charset=utf-8' },
-      })
+  it('fetches the feed URL directly with the JKcom-RSSBot user agent', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(GHOST_RSS_FIXTURE, { status: 200, headers: { 'Content-Type': 'application/rss+xml' } })
     );
 
     const response = await GET({
-      request: new Request('https://example.com/api/rss?url=https%3A%2F%2Fblog.jaysonknight.com%2Ffeed%2F&max=5'),
+      request: new Request('https://example.com/api/rss?url=https%3A%2F%2Fblog.jaysonknight.com%2Frss.xml&max=5'),
     } as Parameters<typeof GET>[0]);
-    const payload = (await response.json()) as { items: Array<{ title: string; link: string; description: string; pubDate: string }> };
 
     expect(response.status).toBe(200);
-    expect(payload.items).toHaveLength(1);
-    expect(payload.items[0].title).toBe('Edge-First Architecture');
-    expect(payload.items[0].link).toBe('https://blog.jaysonknight.com/2026/03/26/edge-first-architecture/');
-    expect(payload.items[0].description).toContain('Cloudflare’s distributed model');
-    expect(payload.items[0].description).not.toContain('<p>');
-
-    // Verify WP.com API was called first and RSS XML was never fetched.
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    const [wpComUrl, wpComOptions] = fetchMock.mock.calls[0];
-    expect(wpComUrl).toBeInstanceOf(URL);
-    expect((wpComUrl as URL).toString()).toContain('https://public-api.wordpress.com/rest/v1.1/sites/blog.jaysonknight.com/posts/');
-    expect((wpComUrl as URL).searchParams.get('number')).toBe('5');
-    expect(wpComOptions).toEqual(
-      expect.objectContaining({
-        cache: 'no-store',
-        signal: expect.any(AbortSignal),
-        headers: expect.objectContaining({
-          Accept: 'application/json',
-          'User-Agent': 'Mozilla/5.0 (compatible; JKcom-RSSBot/1.0; +https://jaysonknight.com)',
-        }),
-      })
+    expect(fetchMock.mock.calls[0][0]).toBe('https://blog.jaysonknight.com/rss.xml');
+    expect((fetchMock.mock.calls[0][1]?.headers as Record<string, string>)['User-Agent']).toContain('JKcom-RSSBot/1.0');
+  });
+
+  it('marks successful responses as cacheable', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(GHOST_RSS_FIXTURE, { status: 200, headers: { 'Content-Type': 'application/rss+xml' } })
     );
-  });
-
-  it('respects max parameter when calling WordPress.com public API', async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify({ posts: [] }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        })
-      )
-      .mockResolvedValueOnce(
-        new Response('<rss><channel></channel></rss>', {
-          status: 200,
-          headers: { 'Content-Type': 'application/xml' },
-        })
-      );
-
-    await GET({
-      request: new Request('https://example.com/api/rss?url=https%3A%2F%2Fblog.jaysonknight.com%2Ffeed%2F&max=10'),
-    } as Parameters<typeof GET>[0]);
-
-    const [wpComUrl] = fetchMock.mock.calls[0];
-    expect((wpComUrl as URL).searchParams.get('number')).toBe('10');
-  });
-
-  it('derives site slug from feed URL hostname for WordPress.com API call', async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify({ posts: [] }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        })
-      )
-      .mockResolvedValueOnce(
-        new Response('<rss><channel></channel></rss>', {
-          status: 200,
-          headers: { 'Content-Type': 'application/xml' },
-        })
-      );
-
-    await GET({
-      request: new Request('https://example.com/api/rss?url=https%3A%2F%2Fblog.jaysonknight.com%2Ffeed%2F'),
-    } as Parameters<typeof GET>[0]);
-
-    const [wpComUrl] = fetchMock.mock.calls[0];
-    expect(wpComUrl).toBeInstanceOf(URL);
-    expect((wpComUrl as URL).hostname).toBe('public-api.wordpress.com');
-    expect((wpComUrl as URL).pathname).toContain('blog.jaysonknight.com');
-  });
-
-  it('falls back to RSS XML feed when WordPress.com API fails', async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
-      .mockRejectedValueOnce(new Error('Network error'))
-      .mockResolvedValueOnce(
-        new Response(GHOST_RSS_FIXTURE, {
-          status: 200,
-          headers: { 'Content-Type': 'application/rss+xml' },
-        })
-      );
 
     const response = await GET({
-      request: new Request('https://example.com/api/rss?url=https%3A%2F%2Fblog.jaysonknight.com%2Ffeed%2F&max=5'),
+      request: new Request('https://example.com/api/rss?url=https%3A%2F%2Fblog.jaysonknight.com%2Frss.xml'),
     } as Parameters<typeof GET>[0]);
-    const payload = (await response.json()) as { items: Array<{ title: string }> };
 
-    expect(response.status).toBe(200);
-    expect(payload.items).toHaveLength(2);
-    expect(payload.items[0].title).toBe('Building AI Agents on Cloudflare Workers');
-
-    // Verify WP.com API was tried first, then RSS XML.
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(fetchMock.mock.calls[0][0]).toBeInstanceOf(URL);
-    expect((fetchMock.mock.calls[0][0] as URL).hostname).toBe('public-api.wordpress.com');
-    expect(fetchMock.mock.calls[1][0]).toBe('https://blog.jaysonknight.com/feed/');
-  });
-
-  it('falls back to RSS XML feed when WordPress.com API returns no posts', async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify({ posts: [] }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        })
-      )
-      .mockResolvedValueOnce(
-        new Response(GHOST_RSS_FIXTURE, {
-          status: 200,
-          headers: { 'Content-Type': 'application/rss+xml' },
-        })
-      );
-
-    const response = await GET({
-      request: new Request('https://example.com/api/rss?url=https%3A%2F%2Fblog.jaysonknight.com%2Ffeed%2F&max=5'),
-    } as Parameters<typeof GET>[0]);
-    const payload = (await response.json()) as { items: Array<{ title: string }> };
-
-    expect(response.status).toBe(200);
-    expect(payload.items).toHaveLength(2);
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(response.headers.get('Cache-Control')).toContain('max-age=300');
   });
 });

@@ -141,51 +141,14 @@ const fetchWithTimeout = async (
   }
 };
 
-/**
- * Parses a WordPress.com public REST API response (`/rest/v1.1/sites/{site}/posts/`).
- * The response shape is `{ posts: Array<{ title, URL, date, excerpt, content }> }`.
- * Returns null when the payload is not a valid WP.com posts response or contains no items.
- */
-const parseWordPressComPosts = (
-  payload: unknown
-): Array<{ title: string; link: string; pubDate: string; description: string }> | null => {
-  if (!payload || typeof payload !== 'object') {
-    return null;
-  }
-
-  const data = payload as Record<string, unknown>;
-  if (!Array.isArray(data.posts)) {
-    return null;
-  }
-
-  const items = data.posts
-    .map((post) => {
-      const source = typeof post === 'object' && post ? (post as Record<string, unknown>) : null;
-      // WP.com uses uppercase `URL` for the post link.
-      const link = typeof source?.URL === 'string' ? source.URL.trim() : '';
-      // Use cleanText (no truncation) for titles so long titles are not silently cut off.
-      const title = cleanText(typeof source?.title === 'string' ? source.title : '') || 'Untitled';
-      const date = typeof source?.date === 'string' ? source.date.trim() : '';
-      const excerpt = typeof source?.excerpt === 'string' ? source.excerpt : '';
-      const parsedPubDate = date ? new Date(date) : null;
-      const pubDate = parsedPubDate && !Number.isNaN(parsedPubDate.getTime()) ? parsedPubDate.toUTCString() : date;
-
-      return {
-        title,
-        link,
-        pubDate,
-        description: cleanDescription(excerpt),
-      };
-    })
-    .filter((item) => item.link);
-
-  return items.length > 0 ? items : null;
-};
-
 const respondWithItems = (items: FeedItem[]): Response =>
   new Response(JSON.stringify({ items }), {
     status: 200,
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      // The blog changes a few times a month; let browsers and the edge reuse a recent copy.
+      'Cache-Control': 'public, max-age=300, s-maxage=600, stale-while-revalidate=3600',
+    },
   });
 
 export const GET: APIRoute = async ({ request }) => {
@@ -212,49 +175,7 @@ export const GET: APIRoute = async ({ request }) => {
   }
   const sanitizedFeedUrl = sanitizeUrlForLog(parsedFeedUrl);
 
-  // Primary: WordPress.com public REST API — unauthenticated, bypasses the Cloudflare WAF
-  // that protects the blog's frontend feed URL. Site slug is derived from the feed URL hostname.
-  const tryWordPressComApi = async (): Promise<FeedItem[] | null> => {
-    try {
-      const site = parsedFeedUrl.hostname;
-      const wpComApiUrl = new URL(
-        `https://public-api.wordpress.com/rest/v1.1/sites/${site}/posts/`
-      );
-      wpComApiUrl.searchParams.set('number', String(max));
-
-      const response = await fetchWithTimeout(wpComApiUrl, {
-        headers: {
-          Accept: 'application/json',
-          'User-Agent': 'Mozilla/5.0 (compatible; JKcom-RSSBot/1.0; +https://jaysonknight.com)',
-        },
-        cache: 'no-store',
-      });
-
-      if (!response.ok) {
-        return null;
-      }
-
-      // Only attempt JSON parsing when the response is JSON to avoid consuming the body
-      // stream needlessly (the same Response instance may be reused in tests).
-      const contentType = response.headers.get('Content-Type')?.toLowerCase() ?? '';
-      if (!contentType.includes('application/json')) {
-        return null;
-      }
-
-      const items = parseWordPressComPosts(await response.json());
-      return items?.slice(0, max) ?? null;
-    } catch {
-      return null;
-    }
-  };
-
-  // Try WordPress.com public API first.
-  const wpComItems = await tryWordPressComApi();
-  if (wpComItems && wpComItems.length > 0) {
-    return respondWithItems(wpComItems);
-  }
-
-  // Secondary: fall back to fetching the RSS XML feed directly.
+  // Fetch the RSS/Atom feed directly.
   try {
     const response = await fetchWithTimeout(feedUrl, {
       headers: {
