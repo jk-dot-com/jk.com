@@ -1,4 +1,13 @@
 import { defineMiddleware, sequence } from 'astro:middleware';
+import { lowercaseBlogPrefix } from './lib/blog-case';
+
+const PERMANENT_REDIRECT = 301;
+
+// Old links spell the blog path with capitals (/BLOG/...); send them to the lowercase route.
+const canonicalBlogCase = defineMiddleware(({ url, redirect }, next) => {
+  const fixed = lowercaseBlogPrefix(url.pathname);
+  return fixed ? redirect(fixed + url.search, PERMANENT_REDIRECT) : next();
+});
 
 // Security headers middleware — defense-in-depth CSP + hardening
 const securityHeaders = defineMiddleware(async ({ request, url }, next) => {
@@ -68,4 +77,4 @@ const securityHeaders = defineMiddleware(async ({ request, url }, next) => {
   return newResponse;
 });
 
-export const onRequest = sequence(securityHeaders);
+export const onRequest = sequence(canonicalBlogCase, securityHeaders);
