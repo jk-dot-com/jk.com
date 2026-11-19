@@ -7,6 +7,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "preview": "astro preview",
     "astro": "astro",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.1",
+    "@vitest/coverage-v8": "^5.1.1",
     "typescript": "^6.0.3",
     "vitest": "^5.0.1",
     "wrangler": "^4.146.0"

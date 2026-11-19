@@ -17,6 +17,13 @@ export default defineConfig({
     : {},
   test: {
     include: ['src/**/*.test.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['cobertura', 'text'],
+      reportsDirectory: './coverage',
+      include: ['src/**/*.{ts,tsx,astro}'],
+      exclude: ['src/**/*.test.ts', 'src/test/**'],
+    },
   },
   resolve: {
     alias: {
