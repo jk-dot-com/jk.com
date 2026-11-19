@@ -77,4 +77,4 @@ const securityHeaders = defineMiddleware(async ({ request, url }, next) => {
   return newResponse;
 });
 
-export const onRequest = sequence(canonicalBlogCase, securityHeaders);
+export const onRequest = sequence(securityHeaders, canonicalBlogCase);
