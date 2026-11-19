@@ -9,3 +9,4 @@ Disallow: /api/
 Disallow: /og-image.png
 
 Sitemap: https://jaysonknight.com/sitemap-index.xml
+Sitemap: https://blog.jaysonknight.com/sitemap.xml
