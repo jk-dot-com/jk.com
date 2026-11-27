@@ -45,7 +45,7 @@
           Azure · Cloudflare · .NET · Privacy
         </p>
         <p class="text-sm" style="color: var(--color-text-ghost);">
-          Charlotte, North Carolina
+          Silicon Valley
         </p>
         <a
           href="tel:+16283772567"
@@ -126,7 +126,7 @@
         <span style="color: var(--color-cyan-dim);">
           Powered by Cloudflare Workers
           <span style="color: var(--color-border);">·</span>
-          Charlotte, NC
+          Silicon Valley
         </span>
       </div>
     </div>

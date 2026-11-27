@@ -181,12 +181,12 @@
     <div
       class="status-readout mb-8 mx-auto"
       style="opacity: {mounted ? 1 : 0}; transform: translateY({mounted ? 0 : -12}px); transition: all 0.6s ease 0.1s;"
-      aria-label="Online. Location: Charlotte, NC. Available for consulting."
+      aria-label="Online. Location: Silicon Valley. Available for consulting."
     >
       <span class="status-dot" aria-hidden="true"></span>
       <span class="status-text status-online">ONLINE</span>
       <span class="status-sep" aria-hidden="true">//</span>
-      <span class="status-text">LOCATION: CHARLOTTE, NC</span>
+      <span class="status-text">LOCATION: SILICON VALLEY</span>
       <span class="status-sep" aria-hidden="true">//</span>
       <span class="status-text">STATUS: AVAILABLE</span>
     </div>
