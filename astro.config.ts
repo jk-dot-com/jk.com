@@ -38,9 +38,6 @@ export default defineConfig({
         $lib: fileURLToPath(new URL('./src/lib', import.meta.url)),
       },
     },
-    build: {
-      rollupOptions: {},
-    },
   },
 
   // Built-in Fonts API
