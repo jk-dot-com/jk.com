@@ -14,7 +14,7 @@ describe('Footer component', () => {
   it('renders the Phosphor SYS: ONLINE status readout bar', () => {
     expect(footerSource).toContain('sys-status');
     expect(footerSource).toContain('SYS: ONLINE');
-    expect(footerSource).toContain('NODE: CLT-01');
+    expect(footerSource).toContain('NODE: SJC-01');
     expect(footerSource).toContain('STACK: ASTRO·SVELTE·CLOUDFLARE');
   });
 

@@ -138,7 +138,7 @@
     <span class="sys-sep" aria-hidden="true">//</span>
     <span class="sys-text">BUILD: {buildDate}</span>
     <span class="sys-sep" aria-hidden="true">//</span>
-    <span class="sys-text">NODE: CLT-01</span>
+    <span class="sys-text">NODE: SJC-01</span>
     <span class="sys-sep" aria-hidden="true">//</span>
     <span class="sys-text">STACK: ASTRO·SVELTE·CLOUDFLARE</span>
   </div>
