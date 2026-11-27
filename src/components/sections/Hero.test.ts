@@ -43,7 +43,7 @@ describe('Hero section', () => {
     expect(heroSource).toContain('status-readout');
     expect(heroSource).toContain('status-dot');
     expect(heroSource).toContain('ONLINE');
-    expect(heroSource).toContain('LOCATION: CHARLOTTE, NC');
+    expect(heroSource).toContain('LOCATION: SILICON VALLEY');
     expect(heroSource).toContain('STATUS: AVAILABLE');
   });
 

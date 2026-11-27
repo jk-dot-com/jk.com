@@ -264,7 +264,7 @@
             ><span style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--color-cyan); letter-spacing: 0.05em;">LOC</span></div>
             <div>
               <div class="text-xs mb-0.5 font-mono uppercase tracking-widest" style="color: var(--color-text-ghost);">Location</div>
-              <div class="text-lg font-medium" style="color: var(--color-text);">Charlotte, North Carolina</div>
+              <div class="text-lg font-medium" style="color: var(--color-text);">Silicon Valley</div>
             </div>
           </div>
         </div>
