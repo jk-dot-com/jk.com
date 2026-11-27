@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitest/config';
-import astroConfig from './astro.config';
+import astroConfig from './astro.config.ts';
 import { fileURLToPath } from 'node:url';
 
 const site = astroConfig.site;
