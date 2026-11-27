@@ -48,11 +48,11 @@
           Charlotte, North Carolina
         </p>
         <a
-          href="tel:+17044082471"
+          href="tel:+16283772567"
           class="text-sm transition-colors"
           style="color: var(--color-cyan-dim); text-decoration: none;"
         >
-          704.408.2471
+          628.377.2567
         </a>
       </div>
 
